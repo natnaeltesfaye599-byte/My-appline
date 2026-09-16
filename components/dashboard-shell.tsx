@@ -45,7 +45,8 @@ import {
   FileSpreadsheet,
   ShieldAlert,
   ClipboardCheck,
-  Sliders
+  Sliders,
+  Share2
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,15 @@ import { SettingsStudio } from "@/components/dashboard/settings-studio";
 import { ProfileManagementModule } from "@/components/dashboard/profile-management-module";
 import { OnboardingProspectStudio } from "@/components/dashboard/onboarding-prospect-studio";
 import { AiAssistantModal } from "@/components/dashboard/ai-assistant";
+import { NotificationBell } from "@/components/dashboard/notification-bell";
+import { CommandPalette } from "@/components/dashboard/command-palette";
+import { FloatingActionButton } from "@/components/dashboard/floating-action-button";
+import { WelcomeBanner } from "@/components/dashboard/welcome-banner";
+import { EarningsCalculator } from "@/components/dashboard/earnings-calculator";
+import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist";
+import { MobileSidebar } from "@/components/dashboard/mobile-sidebar";
+import { MobileBottomNav } from "@/components/dashboard/mobile-bottom-nav";
+import { ShareInviteModal } from "@/components/dashboard/share-invite-modal";
 import { getDictionary, getNavLabel, getBadgeLabel, Locale } from "@/lib/i18n";
 import {
   canRoleAccessWorkspace,
@@ -679,6 +689,10 @@ function SuperAdminWorkspace({
   const [view, setView] = useState<DashboardView>("dashboard");
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
+  const [isEarningsOpen, setIsEarningsOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const handleLogout = async () => {
     await performSecureLogout(currentLocale);
@@ -701,14 +715,41 @@ function SuperAdminWorkspace({
 
   const activeLabel = getNavLabel(currentLocale, view);
 
+  // Global Ctrl+K / Cmd+K Command Palette shortcut
+  useEffect(() => {
+    function onCtrlK(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsCmdPaletteOpen((prev) => !prev);
+      }
+    }
+    document.addEventListener("keydown", onCtrlK);
+    return () => document.removeEventListener("keydown", onCtrlK);
+  }, []);
+
   return (
     <main className="min-h-screen bg-[#f5f8fb] text-slate-900">
+      {/* Mobile Slide-in Sidebar */}
+      <MobileSidebar
+        isOpen={isMobileSidebarOpen}
+        onClose={() => setIsMobileSidebarOpen(false)}
+        currentLocale={currentLocale}
+        view={view}
+        onNavigate={(v) => setView(v)}
+        navigation={allowedNavigation}
+        onLogout={handleLogout}
+        isSuperAdmin={true}
+        currentUser={currentUser}
+        roleLabel={userRole.replace(/_/g, " ")}
+      />
+
       <div className="grid min-h-screen lg:grid-cols-[272px_1fr]">
-        <aside className="hidden bg-brand-navy px-4 py-5 text-white lg:block">
+        {/* Desktop Sidebar */}
+        <aside className="hidden bg-brand-navy px-4 py-5 text-white lg:flex lg:flex-col no-print">
           <Link href={`/${currentLocale}`}>
             <BrandLogo className="mb-8" />
           </Link>
-          <nav className="space-y-1">
+          <nav className="flex-1 space-y-1 overflow-y-auto">
             {allowedNavigation.map((item) => (
               <button
                 key={item.id}
@@ -738,7 +779,6 @@ function SuperAdminWorkspace({
             <p className="mt-3 text-sm font-black">Super Admin Control</p>
             <p className="mt-2 text-xs leading-5 text-white/60">Full platform visibility across members, downlines, flyers, targets, and logs.</p>
           </div>
-
           <div className="mt-6 border-t border-white/10 pt-4">
             <button
               onClick={handleLogout}
@@ -750,92 +790,160 @@ function SuperAdminWorkspace({
           </div>
         </aside>
 
-        <section>
-          <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur lg:px-7">
-            <button className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 lg:hidden">
-              <Menu className="h-5 w-5" />
+        <section className="flex min-w-0 flex-col">
+          {/* ── Sticky Header ── */}
+          <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-slate-200 bg-white/95 px-3 backdrop-blur sm:h-16 sm:gap-3 sm:px-4 lg:px-7 no-print">
+            {/* Mobile hamburger */}
+            <button
+              id="mobile-menu-btn"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white lg:hidden"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="h-4 w-4" />
             </button>
-            <div className="relative flex-1">
+
+            {/* Search — hidden on smallest screens, shown from sm */}
+            <div className="relative hidden flex-1 sm:block">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
-                aria-label="Search"
-                placeholder={dict.header.searchPlaceholder}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm outline-none focus:border-brand-cyan"
+                aria-label="Search — press Ctrl+K"
+                placeholder="Search or Ctrl+K..."
+                readOnly
+                onClick={() => setIsCmdPaletteOpen(true)}
+                className="h-10 w-full cursor-pointer rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-16 text-sm outline-none focus:border-brand-cyan"
               />
+              <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-mono font-bold text-slate-400">
+                ⌘K
+              </kbd>
             </div>
 
-            {/* Language Switcher Pill Button */}
-            <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200">
+            {/* Mobile: page title when search hidden */}
+            <p className="flex-1 truncate text-sm font-black text-brand-navy sm:hidden">{activeLabel}</p>
+
+            {/* Mobile search icon */}
+            <button
+              onClick={() => setIsCmdPaletteOpen(true)}
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white sm:hidden"
+              aria-label="Search"
+            >
+              <Search className="h-4 w-4 text-slate-500" />
+            </button>
+
+            {/* Language switcher — hidden on very small, shown sm+ */}
+            <div className="hidden items-center rounded-xl bg-slate-100 p-1 border border-slate-200 sm:flex">
               <button
                 type="button"
                 onClick={handleToggleLocale}
-                className="flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 text-xs font-black text-brand-navy shadow-sm transition hover:bg-slate-50"
-                title={currentLocale === "en" ? "Switch to አማርኛ (Amharic)" : "Switch to English"}
+                className="flex items-center gap-1 rounded-lg bg-white px-2 py-1 text-xs font-black text-brand-navy shadow-sm transition hover:bg-slate-50"
+                title={currentLocale === "en" ? "Switch to አማርኛ" : "Switch to English"}
               >
-                <span>{currentLocale === "en" ? "🇬🇧 EN" : "🇪🇹 አማርኛ"}</span>
-                <span className="text-[10px] text-slate-400 font-bold">⇄</span>
+                <span>{currentLocale === "en" ? "🇬🇧" : "🇪🇹"}</span>
+                <span className="hidden md:inline">{currentLocale === "en" ? "EN" : "አማ"}</span>
               </button>
             </div>
 
+            {/* Invite & QR button */}
+            <button
+              onClick={() => setIsShareOpen(true)}
+              className="hidden items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-bold text-cyan-800 transition hover:bg-cyan-500/20 sm:inline-flex"
+              title="Share Referral & QR Code"
+            >
+              <Share2 className="h-3.5 w-3.5 text-cyan-600" />
+              <span className="hidden lg:inline">Invite & QR</span>
+              <span className="lg:hidden">Invite</span>
+            </button>
+
+            {/* AI button */}
             <button
               onClick={() => handleOpenAi("Provide an executive diagnostic of our network growth, goals, and downline health.")}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-brand-cyan/40 bg-brand-cyan/10 px-3 py-1.5 text-xs font-bold text-brand-navy transition hover:bg-brand-cyan/20"
+              className="hidden items-center gap-1.5 rounded-lg border border-brand-cyan/40 bg-brand-cyan/10 px-3 py-1.5 text-xs font-bold text-brand-navy transition hover:bg-brand-cyan/20 sm:inline-flex"
             >
               <Sparkles className="h-3.5 w-3.5 text-brand-blue" />
-              <span className="hidden sm:inline">{dict.header.aiStrategist}</span>
+              <span className="hidden lg:inline">{dict.header.aiStrategist}</span>
+              <span className="lg:hidden">AI</span>
             </button>
-            <button className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200">
-              <Bell className="h-4 w-4" />
-            </button>
+
+            <NotificationBell />
+
+            {/* Avatar — visible from md */}
             <div
               onClick={() => setView("profile")}
-              className="hidden items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 md:flex cursor-pointer hover:bg-slate-50 transition"
-              title="Open Profile Management & Avatars"
+              className="hidden items-center gap-2 rounded-lg border border-slate-200 px-2.5 py-1.5 md:flex cursor-pointer hover:bg-slate-50 transition"
+              title="Profile"
             >
-              <div className="h-8 w-8 rounded-full brand-gradient flex items-center justify-center font-bold text-brand-navy text-xs">
+              <div className="h-7 w-7 rounded-full brand-gradient flex items-center justify-center font-bold text-brand-navy text-xs">
                 {currentUser?.name ? currentUser.name.charAt(0) : "SA"}
               </div>
-              <div>
-                <p className="text-xs font-bold">{currentUser?.name || "Super Admin"}</p>
-                <p className="text-[11px] text-slate-500">{userRole.replace(/_/g, " ")}</p>
+              <div className="hidden lg:block">
+                <p className="text-xs font-bold leading-tight">{currentUser?.name || "Super Admin"}</p>
+                <p className="text-[10px] text-slate-500">{userRole.replace(/_/g, " ")}</p>
               </div>
-              <ChevronDown className="h-4 w-4 text-slate-400" />
             </div>
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50/90 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
-              title="Sign Out of MyUpline"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50/90 px-2.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
+              title="Sign Out"
             >
               <LogOut className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Log Out</span>
             </button>
           </header>
 
-          <div className="px-4 py-6 lg:px-7">
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div id="main-view-content" className="printable-content flex-1 overflow-auto px-3 py-4 sm:px-4 sm:py-6 lg:px-7 pb-24 lg:pb-8">
+            {/* Print-Only Official Document Header */}
+            <div className="print-only mb-6 border-b-2 border-slate-900 pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-black tracking-tight text-slate-900">MYUPLINE GLOBAL</h1>
+                  <p className="text-xs font-semibold text-slate-600">Executive Network Management Platform</p>
+                </div>
+                <div className="text-right text-xs text-slate-600">
+                  <p className="font-black text-sm text-slate-900">{activeLabel}</p>
+                  <p>Printed: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} at {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</p>
+                  <p>Role: {userRole.replace(/_/g, " ")} | Operator: {currentUser?.name || "Super Admin"}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Page title + actions row */}
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3 no-print">
               <div>
-                <p className="text-sm text-slate-500">{dict.header.welcomeSuperAdmin}</p>
-                <h1 className="mt-1 text-2xl font-black text-brand-navy sm:text-3xl">
-                  {activeLabel}
-                </h1>
+                <p className="text-xs text-slate-500">{dict.header.welcomeSuperAdmin}</p>
+                <h1 className="mt-0.5 text-xl font-black text-brand-navy sm:text-2xl">{activeLabel}</h1>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button variant="ghost" onClick={() => handleOpenAi("Give me our 3 highest priority goals for this week.")} className="border border-slate-200 bg-white text-xs font-bold">
                   <Sparkles className="mr-1.5 h-3.5 w-3.5 text-brand-blue" />
-                  AI Priorities
-                </Button>
-                <Button variant="ghost" className="border border-slate-200 bg-white">
-                  <CalendarDays className="mr-2 h-4 w-4" />
-                  Jun 2026
+                  <span className="hidden xs:inline">AI Priorities</span>
+                  <span className="xs:hidden">AI</span>
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    const sectionMap: Record<string, string> = {
+                      "reports": "reports-center-printable",
+                      "downline": "downline-table-printable",
+                      "name-list": "printable-name-list-area",
+                      "recruitment": "recruitment-pipeline-table",
+                      "certificates": "certificate-print-area",
+                      "team-faculty": "trainers-printable-area",
+                      "packages-payments": "payments-printable-section",
+                      "motivational-quotes": "motivation-manager-printable",
+                      "goal-analyzer": "goal-analyzer-printable",
+                      "after-sales": "onboarding-upline-dossier",
+                      "training-hub": "training-cert-print-card",
+                      "dream-goal-board": "dream-vision-board-printable",
+                      "promo-studio": "promotional-flyer-print-card",
+                    };
+                    const targetId = sectionMap[view] || "main-view-content";
+                    printSection(targetId, `${activeLabel} — MyUpline Official Report`);
+                  }}
                   className="border border-slate-200 bg-white text-xs font-bold"
                 >
                   <Printer className="mr-1.5 h-4 w-4 text-slate-600" />
-                  Print View
+                  Print
                 </Button>
                 <Button
                   onClick={() => {
@@ -846,28 +954,45 @@ function SuperAdminWorkspace({
                   className="text-xs font-bold"
                 >
                   <Download className="mr-1.5 h-4 w-4" />
-                  Export
+                  <span className="hidden sm:inline">Export</span>
                 </Button>
               </div>
             </div>
 
-            {/* Mobile Tab Scroller */}
-            <div className="mb-5 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-              {superAdminNavigation.map((item) => (
+            {/* Mobile bottom-tab strip */}
+            <div className="mb-4 flex gap-1.5 overflow-x-auto pb-1 scrollbar-none lg:hidden no-print">
+              {allowedNavigation.slice(0, 10).map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setView(item.id)}
                   className={cn(
-                    "shrink-0 rounded-lg px-3 py-2 text-xs font-black transition",
+                    "shrink-0 rounded-xl px-3 py-2 text-[11px] font-black transition whitespace-nowrap",
                     view === item.id ? "brand-gradient text-brand-navy" : "bg-white text-slate-600 border border-slate-200"
                   )}
                 >
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-black text-slate-500 transition whitespace-nowrap hover:border-slate-300"
+              >
+                More ›
+              </button>
             </div>
 
-            {view === "dashboard" ? <SuperAdminDashboard onOpenAi={handleOpenAi} /> : null}
+            {view === "dashboard" ? (
+              <div className="space-y-6">
+                <WelcomeBanner
+                  userName={currentUser?.name}
+                  userRole={userRole}
+                  onOpenCalculator={() => setIsEarningsOpen(true)}
+                  onOpenAi={handleOpenAi}
+                  onOpenShare={() => setIsShareOpen(true)}
+                />
+                <SuperAdminDashboard onOpenAi={handleOpenAi} />
+              </div>
+            ) : null}
             {view === "recruitment" ? <RecruitmentPipeline onOpenAi={handleOpenAi} /> : null}
             {view === "after-sales" ? <AfterSalesOnboarding onOpenAi={handleOpenAi} /> : null}
             {view === "daily-activity" ? <DailyActivityTracker onOpenAi={handleOpenAi} /> : null}
@@ -892,14 +1017,39 @@ function SuperAdminWorkspace({
         </section>
       </div>
 
-      {/* Floating AI Strategist trigger button */}
-      <button
-        onClick={() => handleOpenAi("Provide an executive diagnostic of our network growth, goals, and downline health.")}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 rounded-full brand-gradient px-4 py-3 text-sm font-black text-brand-navy shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/30"
-      >
-        <Sparkles className="h-4 w-4 text-brand-navy" />
-        <span>Ask AI Strategist</span>
-      </button>
+      <FloatingActionButton
+        onNavigate={(v) => setView(v as DashboardView)}
+        onOpenAi={() => handleOpenAi("Provide an executive diagnostic of our network growth, goals, and downline health.")}
+        onOpenShare={() => setIsShareOpen(true)}
+      />
+
+      <MobileBottomNav
+        currentView={view}
+        onNavigate={(v) => setView(v)}
+        onOpenSidebar={() => setIsMobileSidebarOpen(true)}
+        onOpenShare={() => setIsShareOpen(true)}
+        isSuperAdmin={true}
+      />
+
+      <ShareInviteModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        referralCode={currentUser?.referralCode || "SUPER-ADMIN"}
+        userName={currentUser?.name || "Super Admin"}
+        userRole={userRole}
+        locale={currentLocale}
+      />
+
+      <CommandPalette
+        isOpen={isCmdPaletteOpen}
+        onClose={() => setIsCmdPaletteOpen(false)}
+        onNavigate={(v) => { setView(v as DashboardView); setIsCmdPaletteOpen(false); }}
+      />
+
+      <EarningsCalculator
+        isOpen={isEarningsOpen}
+        onClose={() => setIsEarningsOpen(false)}
+      />
 
       <AiAssistantModal
         isOpen={isAiOpen}
@@ -928,6 +1078,10 @@ function GenericDashboard({
   const [view, setView] = useState<DashboardView>("dashboard");
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
+  const [isEarningsOpen, setIsEarningsOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const handleLogout = async () => {
     await performSecureLogout(currentLocale);
@@ -950,14 +1104,41 @@ function GenericDashboard({
 
   const activeLabel = getNavLabel(currentLocale, view);
 
+  // Global Ctrl+K / Cmd+K Command Palette shortcut
+  useEffect(() => {
+    function onCtrlK(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsCmdPaletteOpen((prev) => !prev);
+      }
+    }
+    document.addEventListener("keydown", onCtrlK);
+    return () => document.removeEventListener("keydown", onCtrlK);
+  }, []);
+
   return (
     <main className="min-h-screen bg-[#f5f8fb] text-slate-900">
+      {/* Mobile Slide-in Sidebar */}
+      <MobileSidebar
+        isOpen={isMobileSidebarOpen}
+        onClose={() => setIsMobileSidebarOpen(false)}
+        currentLocale={currentLocale}
+        view={view}
+        onNavigate={(v) => setView(v as DashboardView)}
+        navigation={allowedNavigation as any}
+        onLogout={handleLogout}
+        isSuperAdmin={false}
+        currentUser={currentUser}
+        roleLabel={userRole.replace(/_/g, " ")}
+      />
+
       <div className="grid min-h-screen lg:grid-cols-[260px_1fr]">
-        <aside className="hidden bg-brand-navy px-4 py-5 text-white lg:block">
+        {/* Desktop Sidebar */}
+        <aside className="hidden bg-brand-navy px-4 py-5 text-white lg:flex lg:flex-col no-print">
           <Link href={`/${currentLocale}`}>
             <BrandLogo className="mb-8" />
           </Link>
-          <nav className="space-y-1">
+          <nav className="flex-1 space-y-1 overflow-y-auto">
             {allowedNavigation.map((item) => (
               <button
                 key={item.id}
@@ -984,7 +1165,6 @@ function GenericDashboard({
               </button>
             ))}
           </nav>
-
           <div className="mt-8 border-t border-white/10 pt-4">
             <button
               onClick={handleLogout}
@@ -996,88 +1176,157 @@ function GenericDashboard({
           </div>
         </aside>
 
-        <section>
-          <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur lg:px-7">
-            <button className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 lg:hidden">
-              <Menu className="h-5 w-5" />
+        <section className="flex min-w-0 flex-col">
+          {/* ── Sticky Header ── */}
+          <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-slate-200 bg-white/95 px-3 backdrop-blur sm:h-16 sm:gap-3 sm:px-4 lg:px-7 no-print">
+            {/* Mobile hamburger */}
+            <button
+              id="mobile-menu-btn-generic"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white lg:hidden"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="h-4 w-4" />
             </button>
-            <div className="relative flex-1">
+
+            {/* Search — hidden on mobile */}
+            <div className="relative hidden flex-1 sm:block">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
-                aria-label="Search"
-                placeholder={dict.header.searchPlaceholder}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm outline-none focus:border-brand-cyan"
+                aria-label="Search — press Ctrl+K"
+                placeholder="Search or Ctrl+K..."
+                readOnly
+                onClick={() => setIsCmdPaletteOpen(true)}
+                className="h-10 w-full cursor-pointer rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-16 text-sm outline-none focus:border-brand-cyan"
               />
+              <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-mono font-bold text-slate-400">
+                ⌘K
+              </kbd>
             </div>
 
-            {/* Language Switcher Pill Button */}
-            <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200">
+            {/* Mobile: page title */}
+            <p className="flex-1 truncate text-sm font-black text-brand-navy sm:hidden">{activeLabel}</p>
+
+            {/* Mobile search icon */}
+            <button
+              onClick={() => setIsCmdPaletteOpen(true)}
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white sm:hidden"
+              aria-label="Search"
+            >
+              <Search className="h-4 w-4 text-slate-500" />
+            </button>
+
+            {/* Language switcher */}
+            <div className="hidden items-center rounded-xl bg-slate-100 p-1 border border-slate-200 sm:flex">
               <button
                 type="button"
                 onClick={handleToggleLocale}
-                className="flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 text-xs font-black text-brand-navy shadow-sm transition hover:bg-slate-50"
-                title={currentLocale === "en" ? "Switch to አማርኛ (Amharic)" : "Switch to English"}
+                className="flex items-center gap-1 rounded-lg bg-white px-2 py-1 text-xs font-black text-brand-navy shadow-sm transition hover:bg-slate-50"
+                title={currentLocale === "en" ? "Switch to አማርኛ" : "Switch to English"}
               >
-                <span>{currentLocale === "en" ? "🇬🇧 EN" : "🇪🇹 አማርኛ"}</span>
-                <span className="text-[10px] text-slate-400 font-bold">⇄</span>
+                <span>{currentLocale === "en" ? "🇬🇧" : "🇪🇹"}</span>
+                <span className="hidden md:inline">{currentLocale === "en" ? "EN" : "አማ"}</span>
               </button>
             </div>
 
+            {/* Invite & QR button */}
+            <button
+              onClick={() => setIsShareOpen(true)}
+              className="hidden items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-bold text-cyan-800 transition hover:bg-cyan-500/20 sm:inline-flex"
+              title="Share Referral & QR Code"
+            >
+              <Share2 className="h-3.5 w-3.5 text-cyan-600" />
+              <span className="hidden lg:inline">Invite & QR</span>
+              <span className="lg:hidden">Invite</span>
+            </button>
+
             <button
               onClick={() => handleOpenAi("Provide an action plan for today.")}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-brand-cyan/40 bg-brand-cyan/10 px-3 py-1.5 text-xs font-bold text-brand-navy transition hover:bg-brand-cyan/20"
+              className="hidden items-center gap-1.5 rounded-lg border border-brand-cyan/40 bg-brand-cyan/10 px-3 py-1.5 text-xs font-bold text-brand-navy transition hover:bg-brand-cyan/20 sm:inline-flex"
             >
               <Sparkles className="h-3.5 w-3.5 text-brand-blue" />
-              <span className="hidden sm:inline">{dict.header.aiStrategist}</span>
+              <span className="hidden lg:inline">{dict.header.aiStrategist}</span>
+              <span className="lg:hidden">AI</span>
             </button>
-            <button className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200">
-              <Bell className="h-4 w-4" />
-            </button>
+
+            <NotificationBell />
+
             <div
               onClick={() => setView("profile")}
-              className="hidden items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 md:flex cursor-pointer hover:bg-slate-50 transition"
-              title="Open Profile Management & Avatars"
+              className="hidden items-center gap-2 rounded-lg border border-slate-200 px-2.5 py-1.5 md:flex cursor-pointer hover:bg-slate-50 transition"
+              title="Profile"
             >
-              <div className="h-8 w-8 rounded-full brand-gradient flex items-center justify-center font-bold text-brand-navy text-xs">
+              <div className="h-7 w-7 rounded-full brand-gradient flex items-center justify-center font-bold text-brand-navy text-xs">
                 {currentUser?.name ? currentUser.name.charAt(0) : role.name.charAt(0)}
               </div>
-              <div>
-                <p className="text-xs font-bold">{currentUser?.name || role.name}</p>
-                <p className="text-[11px] text-slate-500">{userRole.replace(/_/g, " ")}</p>
+              <div className="hidden lg:block">
+                <p className="text-xs font-bold leading-tight">{currentUser?.name || role.name}</p>
+                <p className="text-[10px] text-slate-500">{userRole.replace(/_/g, " ")}</p>
               </div>
-              <ChevronDown className="h-4 w-4 text-slate-400" />
             </div>
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50/90 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
-              title="Sign Out of MyUpline"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50/90 px-2.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
+              title="Sign Out"
             >
               <LogOut className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Log Out</span>
             </button>
           </header>
 
-          <div className="px-4 py-6 lg:px-7">
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div id="main-view-content-generic" className="printable-content flex-1 overflow-auto px-3 py-4 sm:px-4 sm:py-6 lg:px-7 pb-24 lg:pb-8">
+            {/* Print-Only Official Document Header */}
+            <div className="print-only mb-6 border-b-2 border-slate-900 pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-black tracking-tight text-slate-900">MYUPLINE GLOBAL</h1>
+                  <p className="text-xs font-semibold text-slate-600">Network Management Platform</p>
+                </div>
+                <div className="text-right text-xs text-slate-600">
+                  <p className="font-black text-sm text-slate-900">{activeLabel}</p>
+                  <p>Printed: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} at {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</p>
+                  <p>Role: {userRole.replace(/_/g, " ")} | Member: {currentUser?.name || role.name}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3 no-print">
               <div>
-                <p className="text-sm text-slate-500">{currentLocale === "am" ? "እንኳን ደህና መጡ" : `Welcome back, ${role.name}`}</p>
-                <h1 className="mt-1 text-2xl font-black text-brand-navy sm:text-3xl">
-                  {activeLabel}
-                </h1>
+                <p className="text-xs text-slate-500">{currentLocale === "am" ? "እንኳን ደህና መጡ" : `Welcome back, ${role.name}`}</p>
+                <h1 className="mt-0.5 text-xl font-black text-brand-navy sm:text-2xl">{activeLabel}</h1>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button variant="ghost" onClick={() => handleOpenAi(`What goals should ${role.name} prioritize this week?`)} className="border border-slate-200 bg-white text-xs font-bold">
                   <Sparkles className="mr-1.5 h-3.5 w-3.5 text-brand-blue" />
-                  AI Priorities
+                  <span className="hidden sm:inline">AI Priorities</span>
+                  <span className="sm:hidden">AI</span>
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    const sectionMap: Record<string, string> = {
+                      "reports": "reports-center-printable",
+                      "downline": "downline-table-printable",
+                      "name-list": "printable-name-list-area",
+                      "recruitment": "recruitment-pipeline-table",
+                      "certificates": "certificate-print-area",
+                      "team-faculty": "trainers-printable-area",
+                      "packages-payments": "payments-printable-section",
+                      "motivational-quotes": "motivation-manager-printable",
+                      "goal-analyzer": "goal-analyzer-printable",
+                      "after-sales": "onboarding-upline-dossier",
+                      "training-hub": "training-cert-print-card",
+                      "dream-goal-board": "dream-vision-board-printable",
+                      "promo-studio": "promotional-flyer-print-card",
+                    };
+                    const targetId = sectionMap[view] || "main-view-content-generic";
+                    printSection(targetId, `${activeLabel} — MyUpline Report`);
+                  }}
                   className="border border-slate-200 bg-white text-xs font-bold"
                 >
                   <Printer className="mr-1.5 h-4 w-4 text-slate-600" />
-                  Print View
+                  Print
                 </Button>
                 <Button
                   onClick={() => {
@@ -1088,32 +1337,52 @@ function GenericDashboard({
                   className="text-xs font-bold"
                 >
                   <Download className="mr-1.5 h-4 w-4" />
-                  Export
+                  <span className="hidden sm:inline">Export</span>
                 </Button>
-                <div className="rounded-lg border border-brand-cyan/30 bg-white px-4 py-2 text-sm font-bold text-brand-navy">
-                  Q2 Growth Plan
-                </div>
               </div>
             </div>
 
-            {/* Mobile Tab Scroller */}
-            <div className="mb-5 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-              {genericNavigation.map((item) => (
+            {/* Mobile bottom-tab strip */}
+            <div className="mb-4 flex gap-1.5 overflow-x-auto pb-1 scrollbar-none lg:hidden no-print">
+              {allowedNavigation.slice(0, 8).map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setView(item.id as DashboardView)}
                   className={cn(
-                    "shrink-0 rounded-lg px-3 py-2 text-xs font-black transition",
+                    "shrink-0 rounded-xl px-3 py-2 text-[11px] font-black transition whitespace-nowrap",
                     view === item.id ? "brand-gradient text-brand-navy" : "bg-white text-slate-600 border border-slate-200"
                   )}
                 >
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-black text-slate-500 whitespace-nowrap hover:border-slate-300"
+              >
+                More ›
+              </button>
             </div>
 
             {view === "dashboard" ? (
               <div className="space-y-6">
+                {/* Welcome Banner + Live KPI Ticker */}
+                <WelcomeBanner
+                  userName={currentUser?.name}
+                  userRole={userRole}
+                  onOpenCalculator={userRole === "MEMBER" || userRole === "TEAM_LEADER" ? () => setIsEarningsOpen(true) : undefined}
+                  onOpenAi={handleOpenAi}
+                  onOpenShare={() => setIsShareOpen(true)}
+                />
+
+                {/* New Member Onboarding Checklist — only for MEMBER role */}
+                {userRole === "MEMBER" && (
+                  <OnboardingChecklist
+                    onNavigate={(v) => setView(v as DashboardView)}
+                    userName={currentUser?.name}
+                  />
+                )}
+
                 {/* Daily Motivational Quote Top Banner */}
                 <MotivationalQuotesWidget onOpenAi={handleOpenAi} isSuperAdmin={userRole === "SUPER_ADMIN" || userRole === "ADMIN"} />
 
@@ -1162,14 +1431,39 @@ function GenericDashboard({
         </section>
       </div>
 
-      {/* Floating AI Strategist trigger button */}
-      <button
-        onClick={() => handleOpenAi(`Give me strategic growth advice for my role as ${role.name}.`)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 rounded-full brand-gradient px-4 py-3 text-sm font-black text-brand-navy shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/30"
-      >
-        <Sparkles className="h-4 w-4 text-brand-navy" />
-        <span>Ask AI Strategist</span>
-      </button>
+      <FloatingActionButton
+        onNavigate={(v) => setView(v as DashboardView)}
+        onOpenAi={() => handleOpenAi(`Give me strategic growth advice for my role as ${role.name}.`)}
+        onOpenShare={() => setIsShareOpen(true)}
+      />
+
+      <MobileBottomNav
+        currentView={view as DashboardView}
+        onNavigate={(v) => setView(v as DashboardView)}
+        onOpenSidebar={() => setIsMobileSidebarOpen(true)}
+        onOpenShare={() => setIsShareOpen(true)}
+        isSuperAdmin={userRole === "SUPER_ADMIN" || userRole === "ADMIN"}
+      />
+
+      <ShareInviteModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        referralCode={currentUser?.referralCode || "UPLINE-7749"}
+        userName={currentUser?.name || role.name}
+        userRole={userRole}
+        locale={currentLocale}
+      />
+
+      <CommandPalette
+        isOpen={isCmdPaletteOpen}
+        onClose={() => setIsCmdPaletteOpen(false)}
+        onNavigate={(v) => { setView(v as DashboardView); setIsCmdPaletteOpen(false); }}
+      />
+
+      <EarningsCalculator
+        isOpen={isEarningsOpen}
+        onClose={() => setIsEarningsOpen(false)}
+      />
 
       <AiAssistantModal
         isOpen={isAiOpen}

@@ -15,11 +15,13 @@ import {
   Trophy,
   Upload,
   UserCheck,
+  Send,
   Zap
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { printSection } from "@/lib/export-utils";
 
 export type PromoType = "new-rank" | "top-recruiter" | "performance";
 
@@ -101,11 +103,16 @@ export function PromotionalStudio({ onOpenAi }: { onOpenAi?: (prompt: string) =>
     setTimeout(() => setCopied(false), 2500);
   }
 
+  function handleShareTelegram() {
+    const text = `🎉 CELEBRATING EXCELLENCE AT MYUPLINE! 🎉\n\nBig Congratulations to ${memberName} for achieving ${rankOrAward} (${achievementStat})!\nTeam: ${teamName}\nDate: ${dateStr}\n\nKeep inspiring the network! 🚀 #MyUpline #Success #Leadership`;
+    const url = `https://t.me/share/url?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+  }
+
   function handleDownloadFlyer() {
     setDownloadSuccess(true);
     setTimeout(() => setDownloadSuccess(false), 3000);
-    // Trigger standard print / image view
-    window.print();
+    printSection("promotional-flyer-print-card", `${memberName || "Member"} Recognition Flyer`);
   }
 
   const themeClasses = {
@@ -118,7 +125,7 @@ export function PromotionalStudio({ onOpenAi }: { onOpenAi?: (prompt: string) =>
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-navy via-brand-deep to-[#1a3668] p-6 text-white shadow-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-navy via-brand-deep to-[#1a3668] p-6 text-white shadow-xl no-print">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300">
             <Sparkles className="h-3.5 w-3.5" />
@@ -148,7 +155,7 @@ export function PromotionalStudio({ onOpenAi }: { onOpenAi?: (prompt: string) =>
       </div>
 
       {/* Template Selector Tabs */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3 no-print">
         {templates.map((tpl) => {
           const Icon = tpl.icon;
           const isSelected = selectedType === tpl.id;
@@ -197,7 +204,7 @@ export function PromotionalStudio({ onOpenAi }: { onOpenAi?: (prompt: string) =>
       {/* Studio Workspace: Controls (Left) & Live Flyer Preview (Right) */}
       <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
         {/* Editor Controls */}
-        <Card className="p-6 border-slate-200 space-y-5">
+        <Card className="p-6 border-slate-200 space-y-5 no-print">
           <div className="border-b border-slate-100 pb-3">
             <h3 className="text-base font-bold text-brand-navy">Flyer Customization Details</h3>
             <p className="text-xs text-slate-500">Edit member photo, rank title, and stats to preview in real-time</p>
@@ -340,6 +347,10 @@ export function PromotionalStudio({ onOpenAi }: { onOpenAi?: (prompt: string) =>
               {copied ? <Check className="mr-2 h-4 w-4 text-emerald-600" /> : <Copy className="mr-2 h-4 w-4" />}
               {copied ? "Caption Copied!" : "Copy Telegram Caption"}
             </Button>
+            <Button onClick={handleShareTelegram} className="bg-[#229ED9] hover:bg-[#1b8ec4] text-white font-bold shadow-sm">
+              <Send className="mr-2 h-4 w-4" />
+              Send to Telegram
+            </Button>
             <Button onClick={handleDownloadFlyer} className="brand-gradient text-brand-navy font-bold">
               <Download className="mr-2 h-4 w-4" />
               {downloadSuccess ? "Preparing Print/Download..." : "Export Flyer Graphic"}
@@ -349,7 +360,7 @@ export function PromotionalStudio({ onOpenAi }: { onOpenAi?: (prompt: string) =>
 
         {/* Live High-Res Flyer Preview */}
         <div className="flex flex-col items-center">
-          <div className="w-full max-w-[460px] overflow-hidden rounded-3xl border-4 shadow-2xl transition-all duration-300 relative bg-gradient-to-b p-7 text-center select-none aspect-[4/5] flex flex-col justify-between"
+          <div id="promotional-flyer-print-card" className="w-full max-w-[460px] overflow-hidden rounded-3xl border-4 shadow-2xl transition-all duration-300 relative bg-gradient-to-b p-7 text-center select-none aspect-[4/5] flex flex-col justify-between"
             style={{
               backgroundImage:
                 themeStyle === "midnight"

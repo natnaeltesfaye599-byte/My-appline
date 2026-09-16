@@ -1,5 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { NetworkStatusIndicator } from "@/components/ui/network-status-indicator";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#0c1e3d"
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
@@ -9,6 +19,12 @@ export const metadata: Metadata = {
   },
   description:
     "MyUpline is a membership management, recruitment, LMS, subscription, and organizational growth platform for modern teams.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "MyUpline"
+  },
   keywords: [
     "membership management",
     "recruitment platform",
@@ -29,7 +45,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <NetworkStatusIndicator />
+      </body>
     </html>
   );
 }

@@ -50,90 +50,85 @@ function triggerDownload(filename: string, content: string, mimeType: string): v
 // ─────────────────────────────────────────────
 // PRINT SECTION (Print a named div to PDF)
 // ─────────────────────────────────────────────
-export function printSection(sectionId: string, title: string): void {
+// ─────────────────────────────────────────────
+// PRINT SECTION (Print a named div/element cleanly)
+// ─────────────────────────────────────────────
+export function printSection(sectionId: string, title?: string): void {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
   const element = document.getElementById(sectionId);
   if (!element) {
-    console.warn(`[MyUpline Export] Print target not found: #${sectionId}`);
-    window.print();
+    console.warn(`[MyUpline Export] Print target not found: #${sectionId}, printing main view`);
+    const fallback = document.getElementById("main-view-content") || document.getElementById("main-content");
+    if (fallback) {
+      triggerDirectPrint(fallback, title || "MyUpline Report");
+    } else {
+      window.print();
+    }
     return;
   }
 
-  const printStyles = `
-    <style>
-      @page { size: A4; margin: 16mm; }
-      * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif !important; }
-      body { margin: 0; padding: 0; background: #fff; color: #111; }
-      .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #00d4ff; padding-bottom: 10px; margin-bottom: 18px; }
-      .print-logo { font-size: 22px; font-weight: 900; color: #0c1e3d; letter-spacing: -1px; }
-      .print-logo span { color: #00d4ff; }
-      .print-meta { font-size: 11px; color: #666; text-align: right; }
-      .print-title { font-size: 18px; font-weight: 900; color: #0c1e3d; margin-bottom: 14px; }
-      table { width: 100%; border-collapse: collapse; font-size: 11px; }
-      th { background: #0c1e3d; color: #fff; padding: 7px 10px; text-align: left; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-      td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
-      tr:nth-child(even) td { background: #f8fafc; }
-      .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
-      .badge-green { background: #d1fae5; color: #065f46; }
-      .badge-blue { background: #dbeafe; color: #1e3a8a; }
-      .badge-amber { background: #fef3c7; color: #92400e; }
-      .badge-rose { background: #ffe4e6; color: #9f1239; }
-      .badge-cyan { background: #cffafe; color: #164e63; }
-      .footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 9px; color: #999; text-align: center; }
-      @media screen { body { display: none; } }
-    </style>
-  `;
+  triggerDirectPrint(element, title || "MyUpline Report");
+}
 
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-  const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+function triggerDirectPrint(target: HTMLElement, title: string): void {
+  const body = document.body;
+  const prevTitle = document.title;
+  if (title) {
+    document.title = `${title} — MyUpline Global`;
+  }
 
-  const printHeader = `
-    <div class="print-header">
-      <div class="print-logo">My<span>Upline</span> Global</div>
-      <div class="print-meta">
-        <div><strong>${title}</strong></div>
-        <div>Generated: ${dateStr} at ${timeStr}</div>
-        <div>MyUpline Management Platform v1.0</div>
+  // Inject a clean official print letterhead if not already present
+  let printHeader = target.querySelector<HTMLElement>(".myupline-runtime-print-header");
+  let createdHeader = false;
+  if (!printHeader) {
+    printHeader = document.createElement("div");
+    printHeader.className = "myupline-runtime-print-header print-only mb-6 border-b-2 border-slate-900 pb-3";
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    printHeader.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0c1e3d; padding-bottom: 8px; margin-bottom: 16px;">
+        <div>
+          <div style="font-size: 20px; font-weight: 900; color: #0c1e3d; letter-spacing: -0.5px;">MyUpline Global</div>
+          <div style="font-size: 11px; color: #64748b; font-weight: 600;">Executive Network Management Platform</div>
+        </div>
+        <div style="text-align: right; font-size: 10px; color: #475569;">
+          <div style="font-weight: 800; font-size: 13px; color: #0c1e3d;">${title}</div>
+          <div>Printed: ${dateStr} at ${timeStr}</div>
+          <div>Status: Verified Official Record</div>
+        </div>
       </div>
-    </div>
-    <div class="print-title">${title}</div>
-  `;
-
-  const printFooter = `
-    <div class="footer">
-      © ${now.getFullYear()} MyUpline Global. Confidential — For Internal Use Only. | Generated ${dateStr} at ${timeStr}
-    </div>
-  `;
-
-  const printContent = element.innerHTML;
-
-  const printWindow = window.open("", "_blank", "width=900,height=700");
-  if (!printWindow) {
-    alert("Pop-up blocked. Please allow pop-ups for this site to enable print.");
-    return;
+    `;
+    target.prepend(printHeader);
+    createdHeader = true;
   }
 
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>${title} — MyUpline Global</title>
-        ${printStyles}
-      </head>
-      <body>
-        ${printHeader}
-        ${printContent}
-        ${printFooter}
-        <script>
-          window.onload = function() {
-            window.print();
-            setTimeout(() => window.close(), 800);
-          };
-        <\/script>
-      </body>
-    </html>
-  `);
-  printWindow.document.close();
+  // Mark body and target with printing classes
+  body.classList.add("myupline-printing-active");
+  target.classList.add("myupline-print-target");
+
+  const cleanup = () => {
+    body.classList.remove("myupline-printing-active");
+    target.classList.remove("myupline-print-target");
+    if (createdHeader && printHeader && printHeader.parentNode) {
+      printHeader.parentNode.removeChild(printHeader);
+    }
+    document.title = prevTitle;
+    window.removeEventListener("afterprint", cleanup);
+  };
+
+  window.addEventListener("afterprint", cleanup);
+
+  // Trigger print dialog
+  try {
+    window.print();
+  } catch (err) {
+    console.error("[MyUpline Export] Print execution error:", err);
+  }
+
+  // Fallback safety cleanup after 2.5s
+  setTimeout(cleanup, 2500);
 }
 
 // ─────────────────────────────────────────────

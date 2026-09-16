@@ -148,7 +148,7 @@ export function NotificationBell() {
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative no-print">
       {/* Bell Button */}
       <button
         id="notification-bell-btn"
@@ -176,7 +176,7 @@ export function NotificationBell() {
 
       {/* Popover */}
       {isOpen && (
-        <div className="absolute right-0 top-12 z-50 w-[360px] max-h-[480px] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/80 ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="absolute right-0 top-12 z-50 w-[calc(100vw-24px)] max-w-[360px] max-h-[480px] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/80 ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2 duration-150">
           {/* Header */}
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-3">
             <div className="flex items-center gap-2">

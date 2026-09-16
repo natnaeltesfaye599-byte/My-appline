@@ -41,6 +41,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { printSection } from "@/lib/export-utils";
 
 // Media Type for each training
 export type MediaType = "video" | "audio" | "ppt";
@@ -1000,7 +1001,7 @@ export function TrainingHub({
       {showCertModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in">
           <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-brand-navy p-4 text-white">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-brand-navy p-4 text-white no-print">
               <div className="flex items-center gap-2">
                 <Medal className="h-5 w-5 text-amber-300" />
                 <h3 className="text-base font-black">
@@ -1017,7 +1018,10 @@ export function TrainingHub({
 
             {/* Certificate Body */}
             <div className="p-6">
-              <div className="rounded-xl border-4 border-[#d4af37] bg-gradient-to-b from-[#fdfcf9] via-white to-[#fbf9f4] p-6 text-center text-slate-900 shadow-lg relative">
+              <div
+                id="training-cert-print-card"
+                className="rounded-xl border-4 border-[#d4af37] bg-gradient-to-b from-[#fdfcf9] via-white to-[#fbf9f4] p-6 text-center text-slate-900 shadow-lg relative"
+              >
                 <div className="flex items-center justify-center gap-2">
                   <ShieldCheck className="h-5 w-5 text-brand-blue" />
                   <span className="text-[10px] font-black tracking-widest text-brand-navy uppercase">
@@ -1060,7 +1064,7 @@ export function TrainingHub({
                 </div>
               </div>
 
-              <div className="mt-5 flex justify-end gap-2">
+              <div className="mt-5 flex justify-end gap-2 no-print">
                 <Button
                   variant="ghost"
                   onClick={() => setShowCertModal(false)}
@@ -1069,7 +1073,14 @@ export function TrainingHub({
                   Close
                 </Button>
                 <Button
-                  onClick={() => window.print()}
+                  onClick={() =>
+                    printSection(
+                      "training-cert-print-card",
+                      earnedCertificateType === "NBO"
+                        ? "Certificate of NBO Completion"
+                        : "Certificate of Basic Training Mastery"
+                    )
+                  }
                   className="brand-gradient text-brand-navy font-bold text-xs"
                 >
                   <Printer className="mr-1.5 h-3.5 w-3.5" /> Print / Save Certificate

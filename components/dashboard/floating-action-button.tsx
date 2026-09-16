@@ -5,6 +5,7 @@ import {
   Activity,
   ClipboardCheck,
   Plus,
+  Share2,
   Sparkles,
   UserPlus,
   X,
@@ -24,11 +25,13 @@ interface FabAction {
 interface FloatingActionButtonProps {
   onNavigate: (view: string) => void;
   onOpenAi: () => void;
+  onOpenShare?: () => void;
 }
 
 export function FloatingActionButton({
   onNavigate,
-  onOpenAi
+  onOpenAi,
+  onOpenShare
 }: FloatingActionButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -76,11 +79,26 @@ export function FloatingActionButton({
         onNavigate("after-sales");
         setIsOpen(false);
       }
-    }
+    },
+    ...(onOpenShare
+      ? [
+          {
+            id: "invite",
+            label: "Invite & Share QR",
+            icon: Share2,
+            color: "bg-gradient-to-r from-blue-600 to-indigo-600",
+            textColor: "text-white",
+            onClick: () => {
+              onOpenShare();
+              setIsOpen(false);
+            }
+          }
+        ]
+      : [])
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col-reverse items-end gap-3">
+    <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-40 flex flex-col-reverse items-end gap-3 no-print">
       {/* Action Items */}
       {isOpen &&
         actions.map((action, i) => {
