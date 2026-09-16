@@ -1,0 +1,1030 @@
+{
+  "organizations": [
+    {
+      "id": "org-default-01",
+      "name": "MyUpline Global",
+      "slug": "myupline"
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-admin-01",
+      "organizationId": "org-default-01",
+      "email": "super-admin@myupline.demo",
+      "phone": "+251911223344",
+      "fullName": "Super Admin",
+      "passwordHash": "SuperAdmin@2026!",
+      "role": "SUPER_ADMIN",
+      "emailVerifiedAt": "2026-09-03T07:14:45.884Z",
+      "profileSetupCompleted": true,
+      "lastLoginAt": "2026-09-03T07:14:45.884Z",
+      "createdAt": "2026-09-03T07:14:45.884Z",
+      "updatedAt": "2026-09-05T09:20:02.130Z"
+    },
+    {
+      "id": "usr-41d1661b",
+      "organizationId": "org-default-01",
+      "email": "ephrem.trainer@myupline.org",
+      "phone": "+251 922 334 455",
+      "fullName": "Ephrem Alemu",
+      "passwordHash": "Ephrem@2026!",
+      "role": "TRAINER",
+      "emailVerifiedAt": "2026-09-03T07:15:42.846Z",
+      "profileSetupCompleted": true,
+      "lastLoginAt": null,
+      "createdAt": "2026-09-03T07:15:42.846Z",
+      "updatedAt": "2026-09-03T07:15:42.846Z"
+    },
+    {
+      "id": "usr-907d6962",
+      "organizationId": "org-default-01",
+      "email": "tedros.member@myupline.org",
+      "phone": "+251 933 445 566",
+      "fullName": "Tewodros Kassaye",
+      "passwordHash": "Tedros@2026!",
+      "role": "MEMBER",
+      "emailVerifiedAt": "2026-09-03T07:16:06.178Z",
+      "profileSetupCompleted": true,
+      "lastLoginAt": null,
+      "createdAt": "2026-09-03T07:16:06.178Z",
+      "updatedAt": "2026-09-03T07:16:06.178Z"
+    },
+    {
+      "id": "usr-df2fcec3",
+      "organizationId": "org-default-01",
+      "email": "nat@gmail.com",
+      "phone": "+251965206785",
+      "fullName": "nat",
+      "passwordHash": "$2b$12$lw00VCrWygwHYTClEH8gcerZTEYX5T7gDSyz5Qnlq7xwEWYjNxR.O",
+      "role": "MEMBER",
+      "emailVerifiedAt": "2026-09-05T08:01:55.326Z",
+      "profileSetupCompleted": true,
+      "lastLoginAt": "2026-09-05T08:01:55.326Z",
+      "createdAt": "2026-09-05T08:01:55.326Z",
+      "updatedAt": "2026-09-05T08:01:55.326Z"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "prof-admin-01",
+      "userId": "usr-admin-01",
+      "firstName": "Super",
+      "lastName": "Admin",
+      "phone": "+251911223344",
+      "country": "Ethiopia",
+      "region": "Addis Ababa",
+      "city": "Bole",
+      "address": "Cameroon Street, Suite 500",
+      "status": "ACTIVE",
+      "rank": "Crown Diamond",
+      "referralCode": "UPLINE-BOSS",
+      "packageType": "Diamond",
+      "createdAt": "2026-09-03T07:14:45.884Z",
+      "updatedAt": "2026-09-05T09:20:02.130Z",
+      "teamName": null,
+      "rawPassword": "SuperAdmin@2026!",
+      "avatarUrl": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231e1b4b'/><circle cx='50' cy='38' r='20' fill='%23d4a373'/></svg>",
+      "bio": "Building the premier Ethiopian direct selling leadership platform.",
+      "telegramHandle": "@selam_director",
+      "whatsappNumber": "+251911223344",
+      "gender": "MALE",
+      "titleOrOccupation": "Chief Operations Officer"
+    },
+    {
+      "id": "prof-09570752",
+      "userId": "usr-41d1661b",
+      "firstName": "Ephrem",
+      "lastName": "Alemu",
+      "phone": "+251 922 334 455",
+      "country": "Ethiopia",
+      "region": "Addis Ababa",
+      "city": "Addis Ababa",
+      "address": "HQ Suite",
+      "status": "ACTIVE",
+      "rank": "Master Trainer",
+      "referralCode": "TRN-9E88E9",
+      "packageType": "Diamond Leader",
+      "teamName": "Addis Pioneers Squad",
+      "assignedTrainings": [
+        "trn-course-01",
+        "trn-course-02"
+      ],
+      "rawPassword": "Ephrem@2026!",
+      "createdAt": "2026-09-03T07:15:42.846Z",
+      "updatedAt": "2026-09-03T07:15:42.846Z"
+    },
+    {
+      "id": "prof-64c6eb2a",
+      "userId": "usr-907d6962",
+      "firstName": "Tewodros",
+      "lastName": "Kassaye",
+      "phone": "+251 933 445 566",
+      "country": "Ethiopia",
+      "region": "Addis Ababa",
+      "city": "Addis Ababa",
+      "address": "N/A",
+      "status": "ACTIVE",
+      "rank": "Gold Builder",
+      "referralCode": "UP-FDBB26",
+      "packageType": "Gold Executive",
+      "teamName": "Hawassa Eagle Squad",
+      "assignedTrainings": [
+        "trn-course-01",
+        "trn-course-03"
+      ],
+      "rawPassword": "Tedros@2026!",
+      "createdAt": "2026-09-03T07:16:06.178Z",
+      "updatedAt": "2026-09-03T07:16:06.178Z"
+    },
+    {
+      "id": "prof-f4f4f19f",
+      "userId": "usr-df2fcec3",
+      "firstName": "nat",
+      "lastName": "IBO",
+      "phone": "+251965206785",
+      "country": "Ethiopia",
+      "region": "Addis Ababa",
+      "city": "Bole, Addis Ababa",
+      "address": "House No. 123, Woreda 03",
+      "status": "PENDING_VERIFICATION",
+      "rank": "Starter IBO",
+      "referralCode": "UP-2C3FE6",
+      "packageType": "Diamond Leader",
+      "createdAt": "2026-09-05T08:01:55.326Z",
+      "updatedAt": "2026-09-05T08:01:55.326Z"
+    }
+  ],
+  "packages": [
+    {
+      "id": "pkg-diamond",
+      "name": "Diamond Leader",
+      "priceETB": 14990,
+      "pv": 500,
+      "badge": "Recommended ⭐",
+      "description": "Maximum compensation tiers, full Academy access, personalized Downline Studio.",
+      "features": [
+        "500 Personal Volume (PV)",
+        "Tier-1 Binary & Matching Commissions",
+        "Full Academy Certification Access",
+        "Priority Upline Placement & Direct Support",
+        "Unlimited Downline Contact Collector"
+      ],
+      "isActive": true,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "pkg-gold",
+      "name": "Gold Executive",
+      "priceETB": 8490,
+      "pv": 250,
+      "badge": "Popular",
+      "description": "Multi-level downline tracking, Basic + Advanced training cohorts.",
+      "features": [
+        "250 Personal Volume (PV)",
+        "Standard Binary Commissions",
+        "Advanced Training Access",
+        "Up to 3-Level Downline Tracking"
+      ],
+      "isActive": true,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "pkg-silver",
+      "name": "Silver Associate",
+      "priceETB": 3990,
+      "pv": 100,
+      "description": "Standard name list manager, daily activity scheduler, basic certification.",
+      "features": [
+        "100 Personal Volume (PV)",
+        "Basic Compensation Tier",
+        "Daily Activity & DMO Scheduler",
+        "Name List Prospect Organizer"
+      ],
+      "isActive": true,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "pkg-bronze",
+      "name": "Bronze Starter",
+      "priceETB": 1990,
+      "pv": 50,
+      "description": "Essential IBO onboarding tools, getting started video library.",
+      "features": [
+        "50 Personal Volume (PV)",
+        "Starter Orientation Videos",
+        "Standard Member Portal Access"
+      ],
+      "isActive": true,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    }
+  ],
+  "paymentMethods": [
+    {
+      "id": "pm-cbe",
+      "name": "Commercial Bank of Ethiopia (CBE)",
+      "accountName": "MyUpline Global PLC",
+      "accountNumber": "1000 2345 6789",
+      "type": "BANK",
+      "instructions": "Please enter your registered phone number in the transfer reason/remark.",
+      "isActive": true,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "pm-telebirr",
+      "name": "Telebirr Merchant",
+      "accountName": "MyUpline Global (Telebirr)",
+      "accountNumber": "+251 911 234 567",
+      "type": "MOBILE_MONEY",
+      "instructions": "Transfer via Telebirr or scan the merchant QR code and screenshot your SMS confirmation.",
+      "isActive": true,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "pm-awash",
+      "name": "Awash Bank",
+      "accountName": "MyUpline Global PLC",
+      "accountNumber": "0130 4567 8901 00",
+      "type": "BANK",
+      "instructions": "Transfer via Awash Mobile Banking or in-branch deposit slip.",
+      "isActive": true,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "pm-boa",
+      "name": "Bank of Abyssinia",
+      "accountName": "MyUpline Global PLC",
+      "accountNumber": "8849 3210 4455",
+      "type": "BANK",
+      "instructions": "Transfer through BoA mobile app or cash deposit.",
+      "isActive": true,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    }
+  ],
+  "trainers": [
+    {
+      "id": "trn-dawit",
+      "userId": "usr-dawit-01",
+      "name": "Coach Dawit Mengistu",
+      "email": "dawit.coach@myupline.org",
+      "phone": "+251 911 223 344",
+      "specialization": "Eric Worre Methodology & Duplication Architecture",
+      "bio": "Crown Diamond Master Trainer with 12+ years experience building international 6-figure downlines.",
+      "rating": 4.9,
+      "assignedCoursesCount": 2,
+      "isActive": true,
+      "teamAssigned": "Trainers Faculty",
+      "assignedTrainings": [
+        "trn-course-03",
+        "trn-course-890b006b"
+      ],
+      "rawPassword": "Trainer@2026",
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "trn-selamawit",
+      "userId": "usr-selam-02",
+      "name": "Selamawit Tadesse",
+      "email": "selamawit.sales@myupline.org",
+      "phone": "+251 912 334 455",
+      "specialization": "8-Step Invitation Script & Objection Elimination",
+      "bio": "Senior Sales Director specialized in professional invitations and warm market conversion.",
+      "rating": 4.8,
+      "assignedCoursesCount": 1,
+      "isActive": true,
+      "teamAssigned": "Addis Pioneers Squad",
+      "assignedTrainings": [
+        "trn-course-02"
+      ],
+      "rawPassword": "Trainer@2026",
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "trn-kassahun",
+      "userId": "usr-kassa-03",
+      "name": "Kassahun Bekele",
+      "email": "kassahun.sys@myupline.org",
+      "phone": "+251 913 445 566",
+      "specialization": "NBO Orientation & 48-Hour Fast-Track Protocol",
+      "bio": "Operations director ensuring 100% compliance, synchronization, and cohort equal start time execution.",
+      "rating": 4.9,
+      "assignedCoursesCount": 1,
+      "isActive": true,
+      "teamAssigned": "Trainers Faculty",
+      "assignedTrainings": [
+        "trn-course-01"
+      ],
+      "rawPassword": "Trainer@2026",
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "trn-bethelhem",
+      "userId": "usr-bethel-04",
+      "name": "Dr. Bethelhem Alemu",
+      "email": "dr.bethelhem@myupline.org",
+      "phone": "+251 914 556 677",
+      "specialization": "Rise of Entrepreneur Mindset & Retention",
+      "bio": "Executive leadership coach focused on transforming employee mindset into scalable entrepreneurial vision.",
+      "rating": 5,
+      "assignedCoursesCount": 1,
+      "isActive": true,
+      "teamAssigned": "Diamond Leadership Council",
+      "assignedTrainings": [
+        "trn-course-04"
+      ],
+      "rawPassword": "Trainer@2026",
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "trn-193ca896",
+      "userId": "usr-41d1661b",
+      "name": "Ephrem Alemu",
+      "email": "ephrem.trainer@myupline.org",
+      "phone": "+251 922 334 455",
+      "specialization": "Objection Handling & 3-Way Calls",
+      "bio": "Diamond rank field leader with top closure rates.",
+      "rating": 5,
+      "assignedCoursesCount": 2,
+      "isActive": true,
+      "teamAssigned": "Addis Pioneers Squad",
+      "assignedTrainings": [
+        "trn-course-01",
+        "trn-course-02"
+      ],
+      "rawPassword": "Ephrem@2026!",
+      "createdAt": "2026-09-03T07:15:42.846Z",
+      "updatedAt": "2026-09-03T07:15:42.846Z"
+    }
+  ],
+  "trainings": [
+    {
+      "id": "trn-course-01",
+      "title": "NBO: New Business Orientation & 48-Hour Launch",
+      "level": "BASIC",
+      "category": "Orientation & Launch",
+      "description": "Crucial orientation for every new IBO: compensation model, PV/GV mechanics, compliance standards, and 48-hour launch blueprint.",
+      "durationMinutes": 25,
+      "format": "VIDEO",
+      "mediaUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "trainerId": "trn-193ca896",
+      "trainerName": "Ephrem Alemu",
+      "trainerPhone": "+251 922 334 455",
+      "materials": [
+        {
+          "id": "mat-01",
+          "name": "NBO_48Hour_Launch_Blueprint.pdf",
+          "type": "PDF",
+          "fileUrl": "/materials/NBO_48Hour_Launch_Blueprint.pdf",
+          "fileSize": "2.4 MB",
+          "description": "Official 48-hour action checklist and contact formula.",
+          "uploadedAt": "2026-09-03T07:14:45.856Z"
+        },
+        {
+          "id": "mat-02",
+          "name": "NBO_Orientation_Master_Slides.pptx",
+          "type": "PPT",
+          "fileUrl": "/materials/NBO_Orientation_Master_Slides.pptx",
+          "fileSize": "6.1 MB",
+          "description": "High-resolution PowerPoint presentation for team meetings.",
+          "uploadedAt": "2026-09-03T07:14:45.856Z"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "Within how many hours must a new IBO initiate their contact list launch?",
+          "options": [
+            "Within 1 month",
+            "Within 48 hours",
+            "Whenever they feel like it",
+            "After 90 days"
+          ],
+          "correctIndex": 1,
+          "explanation": "The first 48 hours are critical for momentum and excitement."
+        }
+      ],
+      "cohortStartTime": "Tonight at 8:00 PM (Equal Time)",
+      "isActive": true,
+      "enrolledCount": 342,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:15:42.846Z"
+    },
+    {
+      "id": "trn-course-02",
+      "title": "Basic Training: 8-Step Invitation Mastery (Eric Worre)",
+      "level": "BASIC",
+      "category": "Prospecting & Invitation",
+      "description": "Master the legendary 8-step invitation methodology: urgency, compliments, invitations, commitment, and schedule confirmation.",
+      "durationMinutes": 22,
+      "format": "HYBRID",
+      "mediaUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "trainerId": "trn-193ca896",
+      "trainerName": "Ephrem Alemu",
+      "trainerPhone": "+251 922 334 455",
+      "materials": [
+        {
+          "id": "mat-03",
+          "name": "Eric_Worre_8Step_Scripts_Amharic_English.pdf",
+          "type": "PDF",
+          "fileUrl": "/materials/Eric_Worre_8Step_Scripts.pdf",
+          "fileSize": "1.8 MB",
+          "description": "Word-for-word invitation scripts in English & Amharic.",
+          "uploadedAt": "2026-09-03T07:14:45.856Z"
+        },
+        {
+          "id": "mat-04",
+          "name": "Live_Invitation_Call_Audiobook.mp3",
+          "type": "AUDIO",
+          "fileUrl": "/materials/Live_Invitation_Call_Audiobook.mp3",
+          "fileSize": "14.2 MB",
+          "description": "Audio examples of professional prospecting calls.",
+          "uploadedAt": "2026-09-03T07:14:45.856Z"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "What is Step 1 of the Eric Worre invitation protocol?",
+          "options": [
+            "Present the product",
+            "Be in a hurry",
+            "Ask for money",
+            "Schedule a meeting"
+          ],
+          "correctIndex": 1,
+          "explanation": "Being in a hurry creates psychological urgency and respect for your time."
+        }
+      ],
+      "cohortStartTime": "Tomorrow at 7:30 PM",
+      "isActive": true,
+      "enrolledCount": 512,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:15:42.846Z"
+    },
+    {
+      "id": "trn-course-03",
+      "title": "Advanced Training: 3-Way Closing & Upline Leverage",
+      "level": "ADVANCED",
+      "category": "Closing & Objection Handling",
+      "description": "How to effectively edify and introduce your upline leader for high-ticket closures, handle tough objections, and secure immediate enrollment.",
+      "durationMinutes": 28,
+      "format": "VIDEO",
+      "mediaUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "trainerId": "trn-dawit",
+      "trainerName": "Coach Dawit Mengistu",
+      "trainerPhone": "+251 911 223 344",
+      "materials": [
+        {
+          "id": "mat-05",
+          "name": "3Way_Call_Closing_PowerPoint.pptx",
+          "type": "PPT",
+          "fileUrl": "/materials/3Way_Call_Closing_PowerPoint.pptx",
+          "fileSize": "8.4 MB",
+          "description": "Slide deck on the psychology of 3-way validation.",
+          "uploadedAt": "2026-09-03T07:14:45.856Z"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "During a 3-way call with your upline, what is your primary job?",
+          "options": [
+            "Interrupt and correct your upline",
+            "Edify your upline, then stay muted and take notes",
+            "Argue with the prospect",
+            "Leave the call entirely"
+          ],
+          "correctIndex": 1,
+          "explanation": "Edify your sponsor, stay quiet, and let third-party validation do the work."
+        }
+      ],
+      "cohortStartTime": "Friday at 8:00 PM",
+      "isActive": true,
+      "enrolledCount": 215,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    },
+    {
+      "id": "trn-course-04",
+      "title": "Rise of Entrepreneur: Mindset Transformation",
+      "level": "LEADERSHIP",
+      "category": "Mindset & Leadership",
+      "description": "A 20-minute transformational module on breaking free from employee mentalities and building scalable residual wealth systems.",
+      "durationMinutes": 20,
+      "format": "VIDEO",
+      "mediaUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "trainerId": "trn-bethelhem",
+      "trainerName": "Dr. Bethelhem Alemu",
+      "trainerPhone": "+251 914 556 677",
+      "materials": [
+        {
+          "id": "mat-06",
+          "name": "Entrepreneur_Mindset_Workbook.pdf",
+          "type": "PDF",
+          "fileUrl": "/materials/Entrepreneur_Mindset_Workbook.pdf",
+          "fileSize": "1.2 MB",
+          "description": "Self-assessment questionnaire and monthly income target worksheet.",
+          "uploadedAt": "2026-09-03T07:14:45.856Z"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "What is the key difference between employee and entrepreneurial income?",
+          "options": [
+            "Employees get paid for systems, entrepreneurs for hours",
+            "Entrepreneurs build systems that generate residual overrides",
+            "There is no difference",
+            "Employees take higher risks"
+          ],
+          "correctIndex": 1,
+          "explanation": "Entrepreneurs build scalable assets that yield ongoing leverage."
+        }
+      ],
+      "cohortStartTime": "Saturday at 10:00 AM",
+      "isActive": true,
+      "enrolledCount": 680,
+      "createdAt": "2026-09-03T07:14:45.856Z",
+      "updatedAt": "2026-09-03T07:14:45.856Z"
+    }
+  ],
+  "blog": [
+    {
+      "id": "blog-001",
+      "title": "How to Build a 6-Figure Downline in 90 Days Using the Duplication Formula",
+      "slug": "build-6-figure-downline-duplication-formula",
+      "excerpt": "Discover the exact replicable system top Diamond leaders use to duplicate results across their entire network — without relying on personal charisma.",
+      "content": "## The Power of Duplication Over Personality\n\nThe biggest mistake most network marketers make is building a business around their personal charisma. If you're the only one who can close, your business stops when you do.\n\nThe true key to a 6-figure downline is **duplication** — a system so simple that every member of your team can follow it, regardless of their background or experience.\n\n## The 3-Step Duplication Formula\n\n### Step 1: Master the NBO (New Business Orientation)\n\nEvery new IBO must complete the 48-hour launch protocol within their first two days. This means:\n- Writing a contact list of 100+ names\n- Scheduling their first home presentation or Zoom\n- Completing the NBO training module\n\n### Step 2: Use the 4 Basics Daily\n\nCommit to four core daily activities:\n1. **Invite** — 2-5 new contacts per day\n2. **Present** — Hold or attend at least one presentation per week\n3. **Follow-up** — Never let a prospect fall through the cracks\n4. **Promote** — Build excitement for the next cohort event\n\n### Step 3: Edify Your Upline for 3-Way Closes\n\nYou don't need to be the expert. Your upline is your leverage. Edify them, introduce them, and let their credibility close for you.\n\n## Real Results\n\nLeaders who follow this system consistently report:\n- First 30 days: 3-5 personally enrolled IBOs\n- First 60 days: Team of 15-20 active builders\n- First 90 days: Multiple Diamond qualifications in their downline\n\n## Conclusion\n\nThe duplication formula isn't magic — it's a discipline. Apply it daily, teach it to your team, and let the system do the work.",
+      "coverImage": "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=1200&q=80",
+      "author": "Coach Dawit Mengistu",
+      "authorRole": "Crown Diamond Master Trainer",
+      "category": "Duplication",
+      "tags": [
+        "duplication",
+        "leadership",
+        "6-figure",
+        "downline"
+      ],
+      "readTimeMinutes": 8,
+      "isPublished": true,
+      "featured": true,
+      "publishedAt": "2026-09-01T07:14:45.856Z",
+      "createdAt": "2026-08-31T07:14:45.857Z",
+      "updatedAt": "2026-09-01T07:14:45.857Z"
+    },
+    {
+      "id": "blog-002",
+      "title": "The Eric Worre 8-Step Invitation Script: A Complete Breakdown for Ethiopian IBOs",
+      "slug": "eric-worre-8-step-invitation-script-ethiopia",
+      "excerpt": "We break down Eric Worre's legendary invitation methodology step-by-step with real Amharic/English examples tailored for the Ethiopian market.",
+      "content": "## Why the Script Works\n\nEric Worre's 8-step invitation protocol is the most battle-tested prospecting system in network marketing history. It works because it respects the prospect's time and positions you as a busy, successful person worth meeting.\n\n## The 8 Steps\n\n**Step 1: Be in a Hurry**\n\nAlways create the impression you have somewhere to be. This triggers respect.\n\n*Script:* \"I only have a minute, but I needed to call you...\"\n\n**Step 2: Compliment Them Sincerely**\n\nPeople open up when they feel genuinely appreciated.\n\n*Script:* \"You are one of the most driven people I know, and I've always admired that about you.\"\n\n**Step 3: Make the Invitation**\n\nBe direct. Don't reveal everything over the phone.\n\n*Script:* \"I've just partnered with something that I think would be perfect for your ambitions. I can't share all the details right now, but I'd love to show you what I've found.\"\n\n**Step 4: If I... Would You...?**\n\nThis powerful conditional exchange creates psychological commitment.\n\n*Script:* \"If I sent you a short video, would you actually watch it before tomorrow morning?\"\n\n**Step 5: Confirmation 1 — Set the Time**\n\n\"When exactly will you watch it? Tonight or tomorrow morning?\"\n\n**Step 6: Confirmation 2 — Confirm the Appointment**\n\n\"So if I call you tomorrow at 9 AM, you'll have watched it by then, right?\"\n\n**Step 7: Get Off the Phone**\n\nDon't oversell. End the call immediately.\n\n**Step 8: Report Back**\n\nFollow up exactly as promised. This is where trust is built.\n\n## In Amharic Context\n\nFor Ethiopian prospects, emphasizing community, family benefit, and stability resonates deeply. Tie Step 2 (the compliment) to their role as a provider and leader within their family.\n\n## Final Note\n\nPractice these steps until they feel natural. Record yourself, play it back, and refine.",
+      "coverImage": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80",
+      "author": "Selamawit Tadesse",
+      "authorRole": "Senior Sales Director",
+      "category": "Recruitment",
+      "tags": [
+        "invitation",
+        "eric-worre",
+        "prospecting",
+        "script"
+      ],
+      "readTimeMinutes": 6,
+      "isPublished": true,
+      "featured": false,
+      "publishedAt": "2026-08-29T07:14:45.857Z",
+      "createdAt": "2026-08-28T07:14:45.857Z",
+      "updatedAt": "2026-08-29T07:14:45.857Z"
+    },
+    {
+      "id": "blog-003",
+      "title": "From Employee Mindset to Financial Freedom: The Entrepreneur Transformation",
+      "slug": "employee-mindset-to-financial-freedom",
+      "excerpt": "Dr. Bethelhem Alemu shares the psychological breakthroughs that separate top-earning IBOs from those who quit in the first 90 days.",
+      "content": "## The Core Mindset Shift\n\nMost people who struggle in network marketing aren't failing because of skill — they're failing because of identity. They still see themselves as employees waiting for a paycheck rather than entrepreneurs building a business.\n\n## The 3 Pillars of Entrepreneurial Thinking\n\n### 1. Trade Time for Systems, Not for Money\n\nEmployees are paid for hours. Entrepreneurs build systems that generate income whether they're working or sleeping. Your downline is your system. Train them well and your income becomes residual.\n\n### 2. Embrace Rejection as Data\n\nA \"no\" from a prospect isn't a personal rejection — it's data. It tells you this person isn't ready today. Every successful Diamond leader has collected thousands of \"nos\" before hitting their first major rank.\n\n### 3. Your Network is Your Net Worth\n\nRelationships are the currency of network marketing. Invest in people. Follow up. Celebrate their wins. Show genuine interest in their success, and they will duplicate that energy throughout your entire organization.\n\n## The 90-Day Identity Challenge\n\nFor the next 90 days, commit to:\n- Reading 10 pages of personal development daily\n- Completing your Daily 4 Basics every single day\n- Attending every team training and Saturday leadership call\n- Writing 3 gratitude statements each morning\n\n## The Result\n\nAfter 90 days of consistent identity work, most IBOs report:\n- Increased confidence in presentations\n- Faster recovery from rejection\n- Deeper team relationships\n- First rank advancement achievement\n\n## You Are Already a Leader\n\nThe fact that you joined and showed up is proof. Now commit to becoming the leader your team needs you to be.",
+      "coverImage": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80",
+      "author": "Dr. Bethelhem Alemu",
+      "authorRole": "Executive Leadership Coach",
+      "category": "Personal Growth",
+      "tags": [
+        "mindset",
+        "entrepreneur",
+        "personal-development",
+        "leadership"
+      ],
+      "readTimeMinutes": 7,
+      "isPublished": true,
+      "featured": false,
+      "publishedAt": "2026-08-26T07:14:45.857Z",
+      "createdAt": "2026-08-25T07:14:45.857Z",
+      "updatedAt": "2026-08-26T07:14:45.857Z"
+    }
+  ],
+  "cms": {
+    "hero": {
+      "badgeText": "🚀 Ethiopia's #1 Network Business Platform",
+      "announcement": "🔥 New Diamond Cohort Starting Tonight at 8:00 PM Equal Time — Register Now!",
+      "headline": "Build Your Business Empire with MyUpline",
+      "subheadline": "The all-in-one platform for Ethiopian network business leaders — recruitment, training, team management, and residual income tracking in one powerful system.",
+      "primaryCtaText": "Start Your Business Journey",
+      "primaryCtaLink": "/en/auth?mode=register",
+      "secondaryCtaText": "Explore the Learning Academy",
+      "secondaryCtaLink": "#learning",
+      "stats": {
+        "activeMembers": 12480,
+        "monthlyVolumeETB": 847000000,
+        "coursesCompleted": 38200,
+        "countriesActive": 7
+      }
+    },
+    "testimonials": [
+      {
+        "id": "tst-001",
+        "name": "Alebe Kebede",
+        "role": "Diamond Team Leader · Addis Ababa",
+        "story": "MyUpline completely transformed how I manage my team. I went from tracking everything in notebooks to having a full dashboard with live PV, downline depth, and daily activity scores. We doubled our follow-ups in 30 days.",
+        "initials": "AK",
+        "rating": 5,
+        "location": "Addis Ababa"
+      },
+      {
+        "id": "tst-002",
+        "name": "Biniyam Tesfaye",
+        "role": "Senior Trainer · Hawassa",
+        "story": "The LMS changed everything for my cohort. Participants can track their own progress, complete quizzes, and earn certificates. Leadership development became something I can measure, not just feel.",
+        "initials": "BT",
+        "rating": 5,
+        "location": "Hawassa"
+      },
+      {
+        "id": "tst-003",
+        "name": "Mulugeta Desta",
+        "role": "Gold Executive IBO · Bahir Dar",
+        "story": "I was skeptical at first, but the recruitment pipeline and name list manager made me consistent. I always knew my next step. Hit Gold Executive in my first 60 days.",
+        "initials": "MD",
+        "rating": 5,
+        "location": "Bahir Dar"
+      },
+      {
+        "id": "tst-004",
+        "name": "Hiwot Girma",
+        "role": "Crown Diamond · Mekelle",
+        "story": "The recognition certificates and dream board features kept me motivated during difficult months. Now my team of 340 active IBOs all use the platform daily. The system duplicates itself.",
+        "initials": "HG",
+        "rating": 5,
+        "location": "Mekelle"
+      }
+    ],
+    "faqs": [
+      {
+        "id": "faq-001",
+        "question": "What is MyUpline and who is it for?",
+        "answer": "MyUpline is a comprehensive business management platform designed specifically for Ethiopian network marketing IBOs, team leaders, trainers, and administrators. It provides tools for recruitment pipeline management, LMS-based training, team tracking, manual payment verification, and performance analytics — all in one role-aware system.",
+        "category": "General",
+        "order": 1
+      },
+      {
+        "id": "faq-002",
+        "question": "How do I register and choose my membership package?",
+        "answer": "Registration is simple: visit our sign-up page, fill in your personal details, select your preferred membership package (Bronze, Silver, Gold, or Diamond), then make a manual bank transfer via CBE, Telebirr, or Awash Bank. Upload your payment receipt screenshot directly in the app. Our admin team reviews and approves your account within 24 hours.",
+        "category": "Registration & Payment",
+        "order": 2
+      },
+      {
+        "id": "faq-003",
+        "question": "Which payment methods are accepted?",
+        "answer": "We accept transfers through Commercial Bank of Ethiopia (CBE), Telebirr Merchant, Awash Bank, and Bank of Abyssinia. After making your transfer, you upload a screenshot of the payment confirmation. Our team manually verifies all transactions and notifies you upon approval.",
+        "category": "Registration & Payment",
+        "order": 3
+      },
+      {
+        "id": "faq-004",
+        "question": "How do training programs and the Academy work?",
+        "answer": "The MyUpline Academy offers structured training modules led by certified coaches. Each course includes video lessons, downloadable materials (PDFs, PowerPoints, audio recordings), knowledge quizzes, and completion certificates. Courses are organized by level: Basic, Advanced, System, and Leadership. Cohorts start at scheduled equal times to build team momentum.",
+        "category": "Training",
+        "order": 4
+      },
+      {
+        "id": "faq-005",
+        "question": "How does the recruitment and prospect tracking system work?",
+        "answer": "The Recruitment Pipeline lets you track every prospect from first contact through presentation, follow-up, and enrollment. The Name List Organizer helps you score and stage your warm market. The Daily Activity Tracker holds you accountable to your 4 Core Basics every day. All data is exportable to CSV for team reporting.",
+        "category": "Recruitment",
+        "order": 5
+      },
+      {
+        "id": "faq-006",
+        "question": "Is my data secure on the platform?",
+        "answer": "Yes. All user data is isolated by role via our RBAC system — members can only see their own data, team leaders see their direct teams, and only Super Admins have platform-wide access. Passwords are securely hashed. Payment receipts are stored as encrypted uploads and are only accessible to admins during the verification process.",
+        "category": "Security",
+        "order": 6
+      }
+    ],
+    "footer": {
+      "brandDescription": "MyUpline is the leading platform for Ethiopian network marketing IBOs — empowering leaders through technology, training, and community.",
+      "brandDescriptionAmharic": "ማይአፕላይን ለኢትዮጵያ ኔትወርክ ማርኬቲንግ መሪዎች ቀዳሚው መድረክ ነው — መሪዎችን በቴክኖሎጂ፣ በስልጠና እና በማህበረሰብ ያበቃል።",
+      "contactEmail": "support@myupline.org",
+      "contactPhone": "+251 911 889 900",
+      "whatsappNumber": "+251 911 223 344",
+      "telegramChannelOrUser": "https://t.me/myuplineofficial",
+      "officeAddress": "Bole Medhanialem, Edna Mall Commercial Complex, 4th Floor, Addis Ababa, Ethiopia",
+      "officeAddressAmharic": "ቦሌ መድኃኔዓለም፣ ኤድና ሞል የንግድ ህንፃ፣ 4ኛ ፎቅ፣ አዲስ አበባ፣ ኢትዮጵያ",
+      "workingHours": "Monday – Saturday: 8:30 AM – 6:30 PM (EAT)",
+      "workingHoursAmharic": "ከሰኞ – ቅዳሜ፡ ከጠዋቱ 2:30 – ከምሽቱ 12:30 (የኢትዮጵያ ሰዓት)",
+      "socialLinks": {
+        "facebook": "https://facebook.com/myupline.ethiopia",
+        "instagram": "https://instagram.com/myupline.official",
+        "linkedin": "https://linkedin.com/company/myupline-global",
+        "telegram": "https://t.me/myupline_exclusive",
+        "whatsapp": "https://wa.me/251911223344",
+        "twitter": "https://twitter.com/myupline_et",
+        "youtube": "https://youtube.com/@myuplineofficial",
+        "tiktok": "https://tiktok.com/@myupline_leaders"
+      },
+      "platformLinks": [
+        {
+          "label": "Dashboard",
+          "labelAm": "ዳሽቦርድ",
+          "href": "/en/auth"
+        },
+        {
+          "label": "LMS Academy",
+          "labelAm": "የስልጠና አካዳሚ",
+          "href": "#learning"
+        },
+        {
+          "label": "Recruitment Pipeline",
+          "labelAm": "የምልመላ ሂደት",
+          "href": "/en/auth"
+        },
+        {
+          "label": "Certificates",
+          "labelAm": "የእውቅና ሰርተፊኬቶች",
+          "href": "/en/auth"
+        },
+        {
+          "label": "Reports & Analytics",
+          "labelAm": "ሪፖርቶች እና ትንታኔ",
+          "href": "/en/auth"
+        },
+        {
+          "label": "Settings",
+          "labelAm": "ቅንብሮች",
+          "href": "/en/auth"
+        }
+      ],
+      "companyLinks": [
+        {
+          "label": "About Us",
+          "labelAm": "ስለ እኛ",
+          "href": "#about"
+        },
+        {
+          "label": "Blog & Insights",
+          "labelAm": "ብሎግ እና ፅሁፎች",
+          "href": "#blog"
+        },
+        {
+          "label": "Leadership Team",
+          "labelAm": "የአመራር ቡድን",
+          "href": "#stories"
+        },
+        {
+          "label": "Contact Us",
+          "labelAm": "ያግኙን",
+          "href": "/en/contact"
+        },
+        {
+          "label": "Privacy Policy",
+          "labelAm": "የግላዊነት ፖሊሲ",
+          "href": "#contact"
+        },
+        {
+          "label": "Terms & Conditions",
+          "labelAm": "ውሎች እና ሁኔታዎች",
+          "href": "#contact"
+        }
+      ],
+      "copyrightText": "© 2026 MyUpline Global PLC. All rights reserved. Platform built for Ethiopian IBOs and network leaders.",
+      "copyrightTextAmharic": "© 2026 ማይአፕላይን ግሎባል ኃ/የተ/የግ/ማህበር። መብቱ በህግ የተጠበቀ ነው። ለኢትዮጵያ የኔትወርክ መሪዎች የተሰራ።",
+      "securityBadgeText": "RBAC-Secured · Data Encrypted · Ethiopian Business Platform"
+    }
+  },
+  "motivations": [
+    {
+      "id": "mot-001",
+      "title": "Consistency Breeds Royalty",
+      "quote": "Leadership is not about being in charge. It is about taking care of those in your charge and guiding them to their highest potential.",
+      "author": "Simon Sinek",
+      "authorRole": "Global Leadership Author",
+      "category": "Leadership",
+      "amharicTranslation": "መሪነት ሌሎችን በሥልጣን መቆጣጠር ሳይሆን በኃላፊነትህ ሥር ያሉትን መንከባከብና ወደ ከፍተኛ አቅማቸው ማብቃት ነው።",
+      "targetType": "ALL",
+      "deliveryChannel": "ALL",
+      "status": "SENT",
+      "sentAt": "2026-09-03T07:14:45.857Z",
+      "sentBy": "Super Admin",
+      "likesCount": 342,
+      "recipientsCount": 12480,
+      "createdAt": "2026-09-03T07:14:45.857Z",
+      "updatedAt": "2026-09-03T07:14:45.857Z"
+    },
+    {
+      "id": "mot-002",
+      "title": "Take Massive Action Today",
+      "quote": "You don't have to be great to start, but you have to start to be great. One conversation today can change your entire network tomorrow.",
+      "author": "Zig Ziglar",
+      "authorRole": "Master Sales Strategist",
+      "category": "Action",
+      "amharicTranslation": "ለመጀመር ምርጥ መሆን አይጠበቅብህም፤ ነገር ግን ምርጥ ለመሆን መጀመር አለብህ። ዛሬ የምታደርገው አንድ ውይይት የነገውን አውታረ መረብህ ሊለውጥ ይችላል።",
+      "targetType": "RANK",
+      "targetRank": "Bronze",
+      "deliveryChannel": "DASHBOARD",
+      "status": "SENT",
+      "sentAt": "2026-09-03T07:14:45.857Z",
+      "sentBy": "Super Admin",
+      "likesCount": 489,
+      "recipientsCount": 3200,
+      "createdAt": "2026-09-03T07:14:45.857Z",
+      "updatedAt": "2026-09-03T07:14:45.857Z"
+    },
+    {
+      "id": "mot-003",
+      "title": "Empire Duplication Protocol",
+      "quote": "Success in this business isn't about selling a product; it is about empowering people to build their own financial freedom and dignity.",
+      "author": "Jim Rohn",
+      "authorRole": "Personal Development Mentor",
+      "category": "Duplication",
+      "amharicTranslation": "በዚህ ንግድ ውስጥ ስኬት ምርት መሸጥ ብቻ ሳይሆን ሰዎች የራሳቸውን የፋይናንስ ነፃነት እና ክብር እንዲገነቡ ማብቃት ነው።",
+      "targetType": "TEAM",
+      "targetTeam": "Diamond Leadership Council",
+      "deliveryChannel": "ALL",
+      "status": "SENT",
+      "sentAt": "2026-09-03T07:14:45.857Z",
+      "sentBy": "Super Admin",
+      "likesCount": 512,
+      "recipientsCount": 145,
+      "createdAt": "2026-09-03T07:14:45.857Z",
+      "updatedAt": "2026-09-03T07:14:45.857Z"
+    },
+    {
+      "id": "mot-004",
+      "title": "Personal Diamond Pace Boost",
+      "quote": "Your relentless commitment to the 4-Basics this week is inspiring the entire team. Stay dialed in on your 3-way calls—your rank advancement is already in motion!",
+      "author": "Super Admin",
+      "authorRole": "Master Upline Command",
+      "category": "Perseverance",
+      "amharicTranslation": "በዚህ ሳምንት ለዕለታዊ 4-መሠረታዊ ተግባራት ያሳየኸው ቁርጠኝነት ቡድኑን በሙሉ እያነቃቃ ነው። በዚሁ ቀጥል፤ ማዕረግህ በቅርብ ነው።",
+      "targetType": "SINGLE",
+      "targetUserId": "usr-3cb71f3c",
+      "targetUserName": "Abebe Bikila",
+      "deliveryChannel": "IN_APP_POPUP",
+      "status": "SENT",
+      "sentAt": "2026-09-03T07:14:45.857Z",
+      "sentBy": "Super Admin",
+      "likesCount": 88,
+      "recipientsCount": 1,
+      "createdAt": "2026-09-03T07:14:45.857Z",
+      "updatedAt": "2026-09-03T07:14:45.857Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay-7dcf7038",
+      "userId": "usr-df2fcec3",
+      "userName": "nat",
+      "userEmail": "nat@gmail.com",
+      "userPhone": "+251965206785",
+      "packageId": "pkg-diamond",
+      "packageName": "Diamond Leader",
+      "amountETB": 14990,
+      "paymentMethod": "Awash Bank",
+      "transactionRef": "sdfghjk",
+      "receiptScreenshotUrl": "data:image/png;base64,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",
+      "status": "PENDING_VERIFICATION",
+      "createdAt": "2026-09-05T08:01:55.337Z",
+      "updatedAt": "2026-09-05T08:01:55.337Z"
+    },
+    {
+      "id": "pay-demo-01",
+      "userId": "usr-3cb71f3c",
+      "userName": "Abebe Bikila",
+      "userEmail": "abebe.test@myupline.org",
+      "userPhone": "+251912345678",
+      "packageId": "pkg-diamond",
+      "packageName": "Diamond Leader",
+      "amountETB": 14990,
+      "paymentMethod": "Commercial Bank of Ethiopia (CBE)",
+      "transactionRef": "CBE-TX-88294103",
+      "receiptScreenshotUrl": "/receipt-sample.png",
+      "status": "PENDING_VERIFICATION",
+      "createdAt": "2026-09-03T07:14:45.884Z",
+      "updatedAt": "2026-09-03T07:14:45.884Z"
+    }
+  ],
+  "teams": [
+    {
+      "id": "team-diamond-001",
+      "name": "Diamond Leadership Council",
+      "description": "Elite crown diamond leaders responsible for national expansion strategy and team duplication oversight.",
+      "leaderId": "usr-admin-01",
+      "leaderName": "Super Admin",
+      "leaderEmail": "super-admin@myupline.demo",
+      "color": "#7c3aed",
+      "memberIds": [],
+      "memberCount": 0,
+      "region": "National",
+      "isActive": true,
+      "createdAt": "2026-09-03T09:13:18.041Z",
+      "updatedAt": "2026-09-03T09:13:18.041Z"
+    },
+    {
+      "id": "team-addis-001",
+      "name": "Addis Pioneers Squad",
+      "description": "Fast-growing frontline squad based in Addis Ababa, specializing in rapid 48-hour launch protocols.",
+      "color": "#0ea5e9",
+      "memberIds": [],
+      "memberCount": 0,
+      "region": "Addis Ababa",
+      "isActive": true,
+      "createdAt": "2026-09-03T09:13:18.041Z",
+      "updatedAt": "2026-09-03T09:13:18.041Z"
+    },
+    {
+      "id": "team-hawassa-001",
+      "name": "Hawassa Eagle Squad",
+      "description": "Southern Ethiopia powerhouse team with high conversion rates in recruitment and 3-way close mastery.",
+      "color": "#10b981",
+      "memberIds": [],
+      "memberCount": 0,
+      "region": "Hawassa",
+      "isActive": true,
+      "createdAt": "2026-09-03T09:13:18.041Z",
+      "updatedAt": "2026-09-03T09:13:18.041Z"
+    },
+    {
+      "id": "team-bahir-001",
+      "name": "Bahir Dar Champions",
+      "description": "Northern growth squad with strong duplication systems and consistent weekly presentations.",
+      "color": "#f59e0b",
+      "memberIds": [],
+      "memberCount": 0,
+      "region": "Bahir Dar",
+      "isActive": true,
+      "createdAt": "2026-09-03T09:13:18.041Z",
+      "updatedAt": "2026-09-03T09:13:18.041Z"
+    },
+    {
+      "id": "team-faculty-001",
+      "name": "Trainers Faculty",
+      "description": "Official training staff and certified coaches responsible for LMS delivery and cohort management.",
+      "color": "#ef4444",
+      "memberIds": [],
+      "memberCount": 0,
+      "region": "National",
+      "isActive": true,
+      "createdAt": "2026-09-03T09:13:18.041Z",
+      "updatedAt": "2026-09-03T09:13:18.041Z"
+    },
+    {
+      "id": "team-mekelle-001",
+      "name": "Mekelle Alpha Builders",
+      "description": "Tigray region emerging leaders accelerating towards Diamond qualification.",
+      "color": "#ec4899",
+      "memberIds": [],
+      "memberCount": 0,
+      "region": "Mekelle",
+      "isActive": true,
+      "createdAt": "2026-09-03T09:13:18.041Z",
+      "updatedAt": "2026-09-03T09:13:18.041Z"
+    }
+  ],
+  "settings": {
+    "id": "settings-global",
+    "organizationName": "MyUpline Ethiopia Enterprise Network",
+    "systemLanguage": "am",
+    "timezone": "Africa/Addis_Ababa (EAT, UTC+3)",
+    "currency": "ETB",
+    "dateFormat": "ETHIOPIAN",
+    "requireEmailVerification": true,
+    "enableAuditLogging": true,
+    "lockAccountAfterFailedAttempts": true,
+    "maxFailedAttempts": 5,
+    "twoFactorAuth": false,
+    "sessionTimeoutMinutes": 60,
+    "manualPaymentVerification": true,
+    "renewalReminders": true,
+    "expireAccessAutomatically": true,
+    "telebirrAutoVerify": true,
+    "dailyMotivationNotification": true,
+    "newDownlineNotification": true,
+    "trainingCohortAlerts": true,
+    "weeklyExecutiveDigest": true,
+    "updatedAt": "2026-09-03T10:10:06.249Z"
+  }
+}
