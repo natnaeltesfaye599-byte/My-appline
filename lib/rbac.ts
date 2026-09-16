@@ -25,7 +25,8 @@ export type DashboardView =
   | "activity"
   | "cms-studio"
   | "team-faculty"
-  | "profile";
+  | "profile"
+  | "onboarding-studio";
 
 // Role mapping from URL slug to Role enum
 export const roleSlugToRoleMap: Record<string, SystemRole> = {
@@ -84,7 +85,8 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
     "activity",
     "cms-studio",
     "team-faculty",
-    "profile"
+    "profile",
+    "onboarding-studio"
   ],
   ADMIN: [
     "dashboard",
@@ -101,7 +103,8 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
     "settings",
     "cms-studio",
     "team-faculty",
-    "profile"
+    "profile",
+    "onboarding-studio"
   ],
   TEAM_LEADER: [
     "dashboard",

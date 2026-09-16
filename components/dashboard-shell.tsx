@@ -43,7 +43,9 @@ import {
   LogOut,
   Printer,
   FileSpreadsheet,
-  ShieldAlert
+  ShieldAlert,
+  ClipboardCheck,
+  Sliders
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
@@ -68,6 +70,7 @@ import { CmsBlogStudio } from "@/components/dashboard/cms-blog-studio";
 import { TeamFacultyStudio } from "@/components/dashboard/team-faculty-studio";
 import { SettingsStudio } from "@/components/dashboard/settings-studio";
 import { ProfileManagementModule } from "@/components/dashboard/profile-management-module";
+import { OnboardingProspectStudio } from "@/components/dashboard/onboarding-prospect-studio";
 import { AiAssistantModal } from "@/components/dashboard/ai-assistant";
 import { getDictionary, getNavLabel, getBadgeLabel, Locale } from "@/lib/i18n";
 import {
@@ -97,7 +100,8 @@ export type DashboardView =
   | "activity"
   | "cms-studio"
   | "team-faculty"
-  | "profile";
+  | "profile"
+  | "onboarding-studio";
 
 const superAdminNavigation: {
   id: DashboardView;
@@ -107,7 +111,7 @@ const superAdminNavigation: {
 }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "recruitment", label: "Recruitment", icon: UserCheck, badge: "Pipeline" },
-  { id: "after-sales", label: "After Sales", icon: UserRound, badge: "Onboard" },
+  { id: "after-sales", label: "Getting Started Form", icon: ClipboardCheck, badge: "Breakthrough" },
   { id: "daily-activity", label: "Daily Activity & KPI", icon: Activity, badge: "DMO" },
   { id: "name-list", label: "Name List Organizer", icon: UsersRound, badge: "Capital-IBO" },
   { id: "training-hub", label: "Training Academy", icon: GraduationCap, badge: "Eric Pro" },
@@ -119,6 +123,7 @@ const superAdminNavigation: {
   { id: "training-studio", label: "Training Studio (CRUD)", icon: GraduationCap, badge: "Faculty" },
   { id: "team-faculty", label: "Team & Trainers (CRUD)", icon: UserCheck, badge: "Access" },
   { id: "cms-studio", label: "CMS & Blog Studio", icon: Globe, badge: "Live" },
+  { id: "onboarding-studio", label: "Booklet & Funnel Studio (CRUD)", icon: Sliders, badge: "Master CRUD" },
   { id: "certificates", label: "Certificates", icon: Award },
   { id: "motivational-quotes", label: "Daily Motivation", icon: Quote },
   { id: "reports", label: "Reports", icon: FileBarChart },
@@ -130,7 +135,7 @@ const superAdminNavigation: {
 const genericNavigation = [
   { id: "dashboard", label: "Overview", icon: LayoutDashboard },
   { id: "recruitment", label: "Recruitment", icon: UserCheck, badge: "Pipeline" },
-  { id: "after-sales", label: "After Sales", icon: UserRound, badge: "Onboard" },
+  { id: "after-sales", label: "Getting Started Form", icon: ClipboardCheck, badge: "Breakthrough" },
   { id: "daily-activity", label: "Daily Activity & KPI", icon: Activity, badge: "DMO" },
   { id: "name-list", label: "Name List Organizer", icon: UsersRound, badge: "Capital-IBO" },
   { id: "training-hub", label: "Training Academy", icon: GraduationCap, badge: "Eric Pro" },
@@ -141,6 +146,7 @@ const genericNavigation = [
   { id: "certificates", label: "Certificates", icon: Award },
   { id: "motivational-quotes", label: "Daily Motivation", icon: Quote },
   { id: "reports", label: "Team Reports", icon: FileBarChart },
+  { id: "onboarding-studio", label: "Booklet & Funnel Studio (CRUD)", icon: Sliders, badge: "Master CRUD" },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "profile", label: "Profile & Avatars", icon: UserRound, badge: "ID" }
 ];
@@ -877,6 +883,7 @@ function SuperAdminWorkspace({
             {view === "training-studio" ? <TrainingManagementStudio onOpenAi={handleOpenAi} /> : null}
             {view === "team-faculty" ? <TeamFacultyStudio onOpenAi={handleOpenAi} /> : null}
             {view === "cms-studio" ? <CmsBlogStudio /> : null}
+            {view === "onboarding-studio" ? <OnboardingProspectStudio onOpenAi={handleOpenAi} /> : null}
             {view === "reports" ? <ReportsView /> : null}
             {view === "settings" ? <SettingsStudio locale={currentLocale} currentUser={currentUser} onLanguageChange={(l) => { setCurrentLocale(l); router.push(`/${l}/dashboard/super-admin`); }} /> : null}
             {view === "profile" ? <ProfileManagementModule locale={currentLocale} currentUser={currentUser} userRole={userRole} onOpenAi={handleOpenAi} /> : null}
@@ -1147,6 +1154,7 @@ function GenericDashboard({
             {view === "training-studio" ? <TrainingManagementStudio onOpenAi={handleOpenAi} /> : null}
             {view === "team-faculty" ? <TeamFacultyStudio onOpenAi={handleOpenAi} /> : null}
             {view === "cms-studio" ? <CmsBlogStudio /> : null}
+            {view === "onboarding-studio" ? <OnboardingProspectStudio onOpenAi={handleOpenAi} /> : null}
             {view === "reports" ? <ReportsView /> : null}
             {view === "settings" ? <SettingsStudio locale={currentLocale} currentUser={currentUser} onLanguageChange={(l) => { setCurrentLocale(l); router.push(`/${l}/dashboard/${roleSlug}`); }} /> : null}
             {view === "profile" ? <ProfileManagementModule locale={currentLocale} currentUser={currentUser} userRole={userRole} onOpenAi={handleOpenAi} /> : null}

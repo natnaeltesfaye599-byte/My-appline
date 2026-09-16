@@ -35,6 +35,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { exportToCsv, printSection } from "@/lib/export-utils";
+import { ProspectQualifierFunnel, ProspectSubmission } from "@/components/prospect-qualifier-funnel";
 
 // Recruitment pipeline stages
 export type RecruitStage = "prospect" | "invited" | "presentation" | "followup" | "enrolled";
@@ -213,10 +214,15 @@ export function RecruitmentPipeline({
   const [prospects, setProspects] = useState<Prospect[]>(initialProspects);
   const [stageFilter, setStageFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"pipeline" | "presentation" | "followup">("pipeline");
+  const [activeTab, setActiveTab] = useState<"pipeline" | "qualifier-funnel" | "presentation" | "followup">("pipeline");
 
   // Selected prospect for detail panel
   const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
+
+  // Selected questionnaire submission to inspect
+  const [selectedSubmission, setSelectedSubmission] = useState<ProspectSubmission | null>(null);
+  const [submissions, setSubmissions] = useState<ProspectSubmission[]>([]);
+  const [funnelCopied, setFunnelCopied] = useState(false);
 
   // Link send state
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
@@ -407,9 +413,10 @@ export function RecruitmentPipeline({
       </div>
 
       {/* TAB SWITCHER */}
-      <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 w-fit">
+      <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 w-fit flex-wrap">
         {[
           { id: "pipeline", label: "Pipeline & Links", icon: Users },
+          { id: "qualifier-funnel", label: "Qualifier Funnel (9 Questions)", icon: Sparkles },
           { id: "presentation", label: "Presentation Data", icon: Video },
           { id: "followup", label: "Follow-up Text Marketing", icon: MessageSquare }
         ].map(({ id, label, icon: Icon }) => (
@@ -840,6 +847,108 @@ export function RecruitmentPipeline({
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* TAB 4: PROSPECT QUALIFIER FUNNEL (IMAGE 1 & IMAGE 2)     */}
+      {/* ======================================================== */}
+      {activeTab === "qualifier-funnel" && (
+        <div className="space-y-6">
+          {/* Share Link Banner */}
+          <Card className="p-5 border-cyan-500/30 bg-gradient-to-r from-[#0b1b38] via-[#0e2347] to-[#07132b] text-white space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-500/20 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-brand-navy shadow-md">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-white">Your Public Prospect Qualifier Link</h3>
+                  <p className="text-xs text-slate-300">
+                    Share this link on Telegram, WhatsApp, or Social Media. Serious leads pass the 3 filters & 9 questions.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const origin = typeof window !== "undefined" ? window.location.origin : "";
+                    const link = `${origin}/am/prospect?ref=UPLINE-LEADER`;
+                    navigator.clipboard.writeText(link);
+                    setFunnelCopied(true);
+                    setTimeout(() => setFunnelCopied(false), 2500);
+                  }}
+                  className="flex items-center gap-1.5 rounded-xl bg-cyan-400 px-3.5 py-2 text-xs font-black text-brand-navy hover:bg-cyan-300 transition shadow-md shadow-cyan-400/20"
+                >
+                  {funnelCopied ? <Check className="h-4 w-4 text-brand-navy" /> : <Copy className="h-4 w-4" />}
+                  {funnelCopied ? "Link Copied!" : "Copy Amharic Link"}
+                </button>
+
+                <a
+                  href="/am/prospect"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2 text-xs font-bold text-white hover:bg-white/20 transition"
+                >
+                  <ExternalLink className="h-4 w-4" /> Open Live Funnel
+                </a>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-slate-700/80 bg-slate-900/80 p-2.5 font-mono text-xs text-cyan-300 flex items-center justify-between">
+              <span className="truncate">https://my-appline.vercel.app/am/prospect?ref=BREAKTHROUGH-LEADER</span>
+              <span className="rounded bg-cyan-400/20 px-2 py-0.5 text-[10px] font-bold uppercase text-cyan-300 shrink-0 ml-2">
+                Bilingual (🇪🇹 / 🇬🇧)
+              </span>
+            </div>
+          </Card>
+
+          {/* Embedded Interactive Preview of Funnel */}
+          <Card className="p-6 border-slate-200 bg-slate-900 text-white shadow-xl">
+            <div className="border-b border-slate-800 pb-3 mb-6 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">
+                  Interactive Simulator
+                </span>
+                <h3 className="text-base font-black text-white mt-0.5">
+                  Live Preview: 3-Step Filter & 9-Question Prospect Intake
+                </h3>
+              </div>
+              <span className="text-xs text-slate-400">Test the prospect journey live</span>
+            </div>
+
+            <ProspectQualifierFunnel
+              isDashboardPreview={true}
+              sponsorName="MyUpline Leadership Team"
+              sponsorRef="DASHBOARD-PREVIEW"
+              onSuccessSubmit={(sub) => {
+                setSubmissions((prev) => [sub, ...prev]);
+                // Also add directly to pipeline
+                const newP: Prospect = {
+                  id: sub.id,
+                  fullName: sub.fullName,
+                  phone: sub.phone,
+                  email: "",
+                  city: sub.address,
+                  source: "Social Media",
+                  stage: "invited",
+                  linkSent: true,
+                  linkSentDate: "Just now",
+                  invitedDate: "Just now",
+                  presentationDate: "-",
+                  presentationTimeSpent: 0,
+                  salesDataShared: false,
+                  followupCount: 0,
+                  lastFollowup: "-",
+                  notes: `[Qualified Lead - Score ${sub.q9_readiness_score}%] Current work: ${sub.q1_current_work}. Dream: ${sub.q2_achieve_goal}. Telegram: ${sub.telegramUsername}`,
+                  interestScore: Math.round(sub.q9_readiness_score / 10)
+                };
+                setProspects((prev) => [newP, ...prev]);
+              }}
+            />
+          </Card>
         </div>
       )}
 

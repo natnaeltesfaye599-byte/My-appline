@@ -44,6 +44,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { exportToCsv, printSection } from "@/lib/export-utils";
+import { GettingStartedBooklet, GettingStartedData } from "@/components/dashboard/getting-started-booklet";
 
 // Training track steps for new IBO onboarding
 type TrainingTrack =
@@ -265,6 +266,24 @@ export function AfterSalesOnboarding({
     markStepComplete("getting-started");
   }
 
+  function handleBookletSave(data: GettingStartedData) {
+    const updatedForm: NewMemberForm = {
+      fullName: data.fullName,
+      phone: data.phone,
+      email: data.email,
+      city: data.city,
+      uplineName: data.uplineName,
+      uplinePhone: data.uplinePhone,
+      startDate: data.startDate,
+      packageType: data.packageType
+    };
+    setForm(updatedForm);
+    setSavedMember(updatedForm);
+    setFormSaved(true);
+    setActiveNewMemberName(data.fullName.split(" ")[0]);
+    markStepComplete("getting-started");
+  }
+
   function handleSubmitQuiz() {
     if (selectedAnswer === null) return;
     setQuizSubmitted(true);
@@ -435,151 +454,25 @@ export function AfterSalesOnboarding({
 
         {/* RIGHT: Active Step Content Panel */}
         <div>
-          {/* STEP 1: GETTING STARTED TRAINING WITH FORM */}
+          {/* STEP 1: GETTING STARTED TRAINING WITH FORM (6-PAGE OFFICIAL BOOKLET) */}
           {activeTrack === "getting-started" && (
-            <Card className="p-6 border-slate-200 space-y-5">
-              <div className="border-b border-slate-100 pb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                    <ClipboardList className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Step 1</span>
-                    <h3 className="text-lg font-black text-brand-navy">Getting Started Training with Form</h3>
-                  </div>
-                </div>
-                <p className="mt-2 text-xs text-slate-600">
-                  Register the new IBO by filling in all required fields. This form generates the Upline Report and activates text marketing templates.
-                </p>
-              </div>
-
-              {formSaved && savedMember ? (
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                    <h4 className="font-black text-emerald-800">New IBO Registered Successfully!</h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-700">
-                    <div><span className="font-bold text-slate-500">Full Name:</span> {savedMember.fullName}</div>
-                    <div><span className="font-bold text-slate-500">Phone:</span> {savedMember.phone}</div>
-                    <div><span className="font-bold text-slate-500">City:</span> {savedMember.city}</div>
-                    <div><span className="font-bold text-slate-500">Package:</span> {savedMember.packageType}</div>
-                    <div><span className="font-bold text-slate-500">Upline:</span> {savedMember.uplineName}</div>
-                    <div><span className="font-bold text-slate-500">Start Date:</span> {savedMember.startDate}</div>
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    <Button
-                      onClick={() => {
-                        setFormSaved(false);
-                        setSavedMember(null);
-                      }}
-                      variant="ghost"
-                      size="sm"
-                      className="border border-slate-200"
-                    >
-                      Edit Form
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => setActiveTrack("nbo")}
-                      className="brand-gradient font-bold text-brand-navy"
-                    >
-                      Proceed to NBO Training <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <form onSubmit={handleSaveForm} className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-1 block text-xs font-bold uppercase text-slate-600">New IBO Full Name</label>
-                      <input
-                        required
-                        value={form.fullName}
-                        onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                        placeholder="e.g. Solomon Hailu Tadesse"
-                        className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-brand-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-bold uppercase text-slate-600">Phone Number</label>
-                      <input
-                        required
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        placeholder="+251 9..."
-                        className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-brand-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-bold uppercase text-slate-600">Email Address</label>
-                      <input
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        placeholder="email@example.com"
-                        type="email"
-                        className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-brand-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-bold uppercase text-slate-600">City / Location</label>
-                      <input
-                        value={form.city}
-                        onChange={(e) => setForm({ ...form, city: e.target.value })}
-                        placeholder="e.g. Addis Ababa"
-                        className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-brand-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-bold uppercase text-slate-600">Direct Upline Sponsor Name</label>
-                      <input
-                        required
-                        value={form.uplineName}
-                        onChange={(e) => setForm({ ...form, uplineName: e.target.value })}
-                        placeholder="e.g. Dawit Mengistu"
-                        className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-brand-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-bold uppercase text-slate-600">Upline Sponsor Phone</label>
-                      <input
-                        value={form.uplinePhone}
-                        onChange={(e) => setForm({ ...form, uplinePhone: e.target.value })}
-                        placeholder="+251 9..."
-                        className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-brand-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-bold uppercase text-slate-600">Registration Start Date</label>
-                      <input
-                        type="date"
-                        value={form.startDate}
-                        onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                        className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-brand-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-bold uppercase text-slate-600">Enrollment Package</label>
-                      <select
-                        value={form.packageType}
-                        onChange={(e) => setForm({ ...form, packageType: e.target.value })}
-                        className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand-blue"
-                      >
-                        <option>Diamond</option>
-                        <option>Gold</option>
-                        <option>Silver</option>
-                        <option>Bronze Starter</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="flex justify-end pt-2 border-t border-slate-100">
-                    <Button type="submit" className="brand-gradient font-bold text-brand-navy">
-                      Register New IBO & Start Onboarding
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </Card>
+            <GettingStartedBooklet
+              initialData={{
+                fullName: form.fullName,
+                phone: form.phone,
+                email: form.email,
+                city: form.city,
+                uplineName: form.uplineName,
+                uplinePhone: form.uplinePhone,
+                startDate: form.startDate,
+                packageType: form.packageType
+              }}
+              onSave={handleBookletSave}
+              onProceedToNbo={() => {
+                markStepComplete("getting-started");
+                setActiveTrack("nbo");
+              }}
+            />
           )}
 
           {/* STEPS 2-5: NBO, BASIC, SYSTEM, 4-SKILLS TRAINING */}

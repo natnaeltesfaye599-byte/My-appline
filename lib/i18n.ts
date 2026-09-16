@@ -54,7 +54,8 @@ export const dictionary = {
       reports: "Reports & Analytics",
       settings: "Platform Settings",
       activity: "Activity Logs",
-      profile: "Profile & Avatars"
+      profile: "Profile & Avatars",
+      onboardingStudio: "Booklet & Funnel Studio (CRUD)"
     },
     badges: {
       Pipeline: "Pipeline",
@@ -224,7 +225,8 @@ export const dictionary = {
       reports: "ሪፖርቶች እና ትንታኔ",
       settings: "የስርዓቱ ቅንብሮች",
       activity: "የስርዓት ክንውኖች ማስታወሻ",
-      profile: "የግል መገለጫ እና አቫታር"
+      profile: "የግል መገለጫ እና አቫታር",
+      onboardingStudio: "የአቀባበል እና ፈነል ስቱዲዮ (CRUD)"
     },
     badges: {
       Pipeline: "የምልመላ ቧንቧ",
@@ -377,7 +379,8 @@ export function getNavLabel(locale: string, navId: string): string {
     reports: dict.nav.reports,
     settings: dict.nav.settings,
     activity: dict.nav.activity,
-    profile: (dict.nav as any).profile || "Profile & Avatars"
+    profile: (dict.nav as any).profile || "Profile & Avatars",
+    "onboarding-studio": (dict.nav as any).onboardingStudio || "Booklet & Funnel Studio (CRUD)"
   };
   return map[navId] || navId;
 }
