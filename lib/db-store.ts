@@ -1880,7 +1880,7 @@ export const dbStore = {
     query?: string;
   }): Array<{ user: StoredUser; profile: StoredProfile }> {
     const db = ensureDb();
-    let result: Array<{ user: StoredUser; profile: StoredProfile }> = [];
+    const result: Array<{ user: StoredUser; profile: StoredProfile }> = [];
 
     for (const user of db.users) {
       const profile = db.profiles.find((p) => p.userId === user.id) || {

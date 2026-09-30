@@ -186,18 +186,20 @@ export function exportDownlineContacts(contacts: Array<Record<string, unknown>>)
   exportToCsv(`MyUpline_Downline_${dateSuffix()}`, rows);
 }
 
+type TargetActualMetric = { target?: number | string; actual?: number | string };
+
 export function exportDailyActivity(logs: Array<Record<string, unknown>>): void {
   const rows = logs.map((l) => ({
     Date: l.date,
     "Day Label": l.dayLabel,
-    "Calling Time Target": (l.callingTime as any)?.target,
-    "Calling Time Actual": (l.callingTime as any)?.actual,
-    "Presentations Target": (l.presentationTime as any)?.target,
-    "Presentations Actual": (l.presentationTime as any)?.actual,
-    "Training Time Target": (l.trainingTime as any)?.target,
-    "Training Time Actual": (l.trainingTime as any)?.actual,
-    "Prospecting Target": (l.prospecting as any)?.target,
-    "Prospecting Actual": (l.prospecting as any)?.actual,
+    "Calling Time Target": (l.callingTime as TargetActualMetric | undefined)?.target,
+    "Calling Time Actual": (l.callingTime as TargetActualMetric | undefined)?.actual,
+    "Presentations Target": (l.presentationTime as TargetActualMetric | undefined)?.target,
+    "Presentations Actual": (l.presentationTime as TargetActualMetric | undefined)?.actual,
+    "Training Time Target": (l.trainingTime as TargetActualMetric | undefined)?.target,
+    "Training Time Actual": (l.trainingTime as TargetActualMetric | undefined)?.actual,
+    "Prospecting Target": (l.prospecting as TargetActualMetric | undefined)?.target,
+    "Prospecting Actual": (l.prospecting as TargetActualMetric | undefined)?.actual,
     Reflection: l.reflection
   }));
   exportToCsv(`MyUpline_DailyKPI_${dateSuffix()}`, rows);

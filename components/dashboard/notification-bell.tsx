@@ -98,11 +98,11 @@ const typeConfig: Record<
   AppNotification["type"],
   { icon: typeof Bell; bg: string; text: string }
 > = {
-  payment: { icon: CreditCard, bg: "bg-amber-50", text: "text-amber-600" },
-  member: { icon: UserPlus, bg: "bg-emerald-50", text: "text-emerald-600" },
-  goal: { icon: Star, bg: "bg-purple-50", text: "text-purple-600" },
-  alert: { icon: AlertTriangle, bg: "bg-red-50", text: "text-red-600" },
-  announcement: { icon: Megaphone, bg: "bg-cyan-50", text: "text-cyan-600" }
+  payment: { icon: CreditCard, bg: "bg-amber-50 dark:bg-amber-950/60", text: "text-amber-600 dark:text-amber-400" },
+  member: { icon: UserPlus, bg: "bg-emerald-50 dark:bg-emerald-950/60", text: "text-emerald-600 dark:text-emerald-400" },
+  goal: { icon: Star, bg: "bg-purple-50 dark:bg-purple-950/60", text: "text-purple-600 dark:text-purple-400" },
+  alert: { icon: AlertTriangle, bg: "bg-red-50 dark:bg-red-950/60", text: "text-red-600 dark:text-red-400" },
+  announcement: { icon: Megaphone, bg: "bg-cyan-50 dark:bg-cyan-950/60", text: "text-cyan-600 dark:text-cyan-400" }
 };
 
 export function NotificationBell() {
@@ -154,10 +154,10 @@ export function NotificationBell() {
         id="notification-bell-btn"
         onClick={() => setIsOpen((prev) => !prev)}
         className={cn(
-          "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border transition",
+          "relative inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border transition",
           isOpen
-            ? "border-cyan-300 bg-cyan-50 text-cyan-700"
-            : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+            ? "border-cyan-300 bg-cyan-50 text-cyan-700 dark:border-cyan-500/50 dark:bg-cyan-950/50 dark:text-cyan-300"
+            : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
         )}
         title="Notifications"
         aria-label={`Notifications — ${unreadCount} unread`}
@@ -176,14 +176,14 @@ export function NotificationBell() {
 
       {/* Popover */}
       {isOpen && (
-        <div className="absolute right-0 top-12 z-50 w-[calc(100vw-24px)] max-w-[360px] max-h-[480px] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/80 ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="absolute right-0 top-12 z-50 w-[calc(100vw-24px)] max-w-[360px] max-h-[480px] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/80 ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2 duration-150 dark:border-slate-800 dark:bg-slate-900 dark:shadow-black/60">
           {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-3">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center gap-2">
-              <Bell className="h-4 w-4 text-brand-navy" />
-              <span className="text-sm font-black text-brand-navy">Notifications</span>
+              <Bell className="h-4 w-4 text-brand-navy dark:text-cyan-400" />
+              <span className="text-sm font-black text-brand-navy dark:text-white">Notifications</span>
               {unreadCount > 0 && (
-                <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-black text-rose-600">
+                <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-black text-rose-600 dark:bg-rose-950/60 dark:text-rose-400">
                   {unreadCount} new
                 </span>
               )}
@@ -191,7 +191,7 @@ export function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold text-cyan-600 hover:bg-cyan-50 transition"
+                className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold text-cyan-600 hover:bg-cyan-50 transition dark:text-cyan-400 dark:hover:bg-cyan-950/50"
               >
                 <CheckCircle2 className="h-3 w-3" />
                 Mark all read
@@ -201,12 +201,12 @@ export function NotificationBell() {
 
           {/* Notification List */}
           {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-12 text-slate-400">
+            <div className="flex flex-col items-center justify-center gap-2 py-12 text-slate-400 dark:text-slate-500">
               <Inbox className="h-8 w-8" />
               <p className="text-xs font-semibold">All caught up!</p>
             </div>
           ) : (
-            <ul className="divide-y divide-slate-50">
+            <ul className="divide-y divide-slate-50 dark:divide-slate-800/60">
               {notifications.map((notification) => {
                 const cfg = typeConfig[notification.type];
                 const Icon = cfg.icon;
@@ -214,8 +214,8 @@ export function NotificationBell() {
                   <li
                     key={notification.id}
                     className={cn(
-                      "group flex gap-3 px-4 py-3.5 transition hover:bg-slate-50",
-                      !notification.isRead && "bg-cyan-50/40"
+                      "group flex gap-3 px-4 py-3.5 transition hover:bg-slate-50 dark:hover:bg-slate-800/60",
+                      !notification.isRead && "bg-cyan-50/40 dark:bg-cyan-950/20"
                     )}
                   >
                     <div
@@ -233,31 +233,31 @@ export function NotificationBell() {
                           className={cn(
                             "text-xs leading-snug",
                             notification.isRead
-                              ? "font-medium text-slate-700"
-                              : "font-black text-slate-900"
+                              ? "font-medium text-slate-700 dark:text-slate-300"
+                              : "font-black text-slate-900 dark:text-white"
                           )}
                         >
                           {notification.title}
                         </p>
                         <button
                           onClick={() => dismissOne(notification.id)}
-                          className="mt-0.5 shrink-0 text-slate-300 opacity-0 transition hover:text-slate-500 group-hover:opacity-100"
+                          className="mt-0.5 shrink-0 text-slate-300 opacity-0 transition hover:text-slate-500 dark:text-slate-600 dark:hover:text-slate-300 group-hover:opacity-100"
                           title="Dismiss"
                         >
                           <X className="h-3 w-3" />
                         </button>
                       </div>
-                      <p className="mt-0.5 text-[11px] text-slate-500 leading-relaxed">
+                      <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                         {notification.description}
                       </p>
                       <div className="mt-1.5 flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-semibold text-slate-400">
+                        <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
                           {notification.time}
                         </span>
                         {!notification.isRead && (
                           <button
                             onClick={() => markOneRead(notification.id)}
-                            className="flex items-center gap-1 text-[10px] font-bold text-cyan-600 hover:underline"
+                            className="flex items-center gap-1 text-[10px] font-bold text-cyan-600 hover:underline dark:text-cyan-400"
                           >
                             <Check className="h-3 w-3" />
                             Mark read
@@ -266,7 +266,7 @@ export function NotificationBell() {
                       </div>
                     </div>
                     {!notification.isRead && (
-                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-cyan-500" />
+                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-cyan-500 shadow-sm" />
                     )}
                   </li>
                 );
@@ -275,8 +275,8 @@ export function NotificationBell() {
           )}
 
           {/* Footer */}
-          <div className="sticky bottom-0 border-t border-slate-100 bg-white px-4 py-2.5 text-center">
-            <span className="text-[10px] font-semibold text-slate-400">
+          <div className="sticky bottom-0 border-t border-slate-100 bg-white px-4 py-2.5 text-center dark:border-slate-800 dark:bg-slate-900">
+            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
               Showing last {notifications.length} notifications • MyUpline Platform
             </span>
           </div>

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
@@ -11,6 +12,24 @@ export const revalidate = 0;
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET ?? "development-only-secret"
 );
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string; role: string }>;
+}): Promise<Metadata> {
+  const { locale, role } = await params;
+  const roleItem = roles.find((r) => r.slug === role);
+  const roleName = roleItem ? roleItem.name : "Executive";
+  return {
+    title:
+      locale === "am"
+        ? `${roleName} ዳሽቦርድ — MyUpline`
+        : `${roleName} Dashboard — MyUpline`,
+    description: `Executive management portal for ${roleName} on MyUpline Global platform.`,
+    robots: { index: false, follow: false }
+  };
+}
 
 export default async function RoleDashboardPage({
   params

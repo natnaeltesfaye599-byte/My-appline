@@ -379,8 +379,8 @@ export function getNavLabel(locale: string, navId: string): string {
     reports: dict.nav.reports,
     settings: dict.nav.settings,
     activity: dict.nav.activity,
-    profile: (dict.nav as any).profile || "Profile & Avatars",
-    "onboarding-studio": (dict.nav as any).onboardingStudio || "Booklet & Funnel Studio (CRUD)"
+    profile: (dict.nav as unknown as Record<string, string>).profile || "Profile & Avatars",
+    "onboarding-studio": (dict.nav as unknown as Record<string, string>).onboardingStudio || "Booklet & Funnel Studio (CRUD)"
   };
   return map[navId] || navId;
 }

@@ -83,6 +83,7 @@ import { MobileSidebar } from "@/components/dashboard/mobile-sidebar";
 import { MobileBottomNav } from "@/components/dashboard/mobile-bottom-nav";
 import { ShareInviteModal } from "@/components/dashboard/share-invite-modal";
 import { getDictionary, getNavLabel, getBadgeLabel, Locale } from "@/lib/i18n";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   canRoleAccessWorkspace,
   canRoleAccessView,
@@ -854,6 +855,8 @@ function SuperAdminWorkspace({
               <span className="lg:hidden">Invite</span>
             </button>
 
+            <ThemeToggle />
+
             {/* AI button */}
             <button
               onClick={() => handleOpenAi("Provide an executive diagnostic of our network growth, goals, and downline health.")}
@@ -1239,6 +1242,8 @@ function GenericDashboard({
               <span className="hidden lg:inline">Invite & QR</span>
               <span className="lg:hidden">Invite</span>
             </button>
+
+            <ThemeToggle />
 
             <button
               onClick={() => handleOpenAi("Provide an action plan for today.")}

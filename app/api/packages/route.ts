@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ok, problem, created, validationProblem } from "@/lib/api-response";
 import { dbStore } from "@/lib/db-store";
@@ -44,7 +43,7 @@ export async function POST(request: Request) {
     });
 
     return created({ package: createdPkg });
-  } catch (error) {
+  } catch {
     return problem(500, "Failed to create package");
   }
 }
@@ -60,7 +59,7 @@ export async function PUT(request: Request) {
     if (!updated) return problem(404, "Package not found");
 
     return ok({ package: updated });
-  } catch (error) {
+  } catch {
     return problem(500, "Failed to update package");
   }
 }
@@ -75,7 +74,7 @@ export async function DELETE(request: Request) {
     if (!deleted) return problem(404, "Package not found");
 
     return ok({ message: "Package deleted successfully" });
-  } catch (error) {
+  } catch {
     return problem(500, "Failed to delete package");
   }
 }

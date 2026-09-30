@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { AuthForm } from "@/components/auth-form";
@@ -7,8 +8,24 @@ export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "am" }];
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: locale === "am" ? "ይመዝገቡ — MyUpline" : "Create Account — MyUpline",
+    description:
+      locale === "am"
+        ? "ወደ MyUpline ይቀላቀሉ — የአባልነት አስተዳደር፣ ስልጠና እና ኔትወርክ ዕድገት ፕላትፎርም።"
+        : "Join MyUpline — the all-in-one platform for membership management, network growth, and certified training.",
+    robots: { index: true, follow: true },
+  };
+}
+
 export default async function SignUpPage({
-  params
+  params,
 }: {
   params: Promise<{ locale: string }>;
 }) {

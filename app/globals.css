@@ -8,6 +8,46 @@
   --border: 216 28% 88%;
 }
 
+/* Dark mode CSS variables */
+.dark {
+  --background: 222 72% 6%;
+  --foreground: 210 40% 96%;
+  --border: 216 28% 20%;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: 222 72% 6%;
+    --foreground: 210 40% 96%;
+    --border: 216 28% 20%;
+    color-scheme: dark;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+   ───────────────────────────────────────────── */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20%       { transform: rotate(-12deg); }
+  40%       { transform: rotate(12deg); }
+  60%       { transform: rotate(-8deg); }
+  80%       { transform: rotate(8deg); }
+}
+
+/* ─────────────────────────────────────────────
+   UNIVERSAL SCROLLBAR HIDING (cross-browser)
+   ───────────────────────────────────────────── */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;             /* Chrome/Safari/Opera */
+}
+
+
 * {
   box-sizing: border-box;
 }

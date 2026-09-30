@@ -6,11 +6,24 @@ export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "am" }];
 }
 
-export const metadata: Metadata = {
-  title: "Prospect Qualification Assessment | Breakthrough Share Company",
-  description:
-    "Official 3-Step Screening & 9-Question Assessment Funnel for serious prospective leaders ready to build a system and grow financially with Breakthrough Share Company."
-};
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title:
+      locale === "am"
+        ? "የዕጩዎች ብቃት መመዘኛ ፈንል | Breakthrough Share Company"
+        : "Prospect Qualification Assessment | Breakthrough Share Company",
+    description:
+      locale === "am"
+        ? "ለከፍተኛ ኔትወርክ መሪዎች የተዘጋጀ ባለ 3-ደረጃ እና 9-ጥያቄዎች የብቃት መመዘኛ ፈንል።"
+        : "Official 3-Step Screening & 9-Question Assessment Funnel for serious prospective leaders ready to build a system and grow financially with Breakthrough Share Company.",
+    robots: { index: true, follow: true }
+  };
+}
 
 export default async function ProspectFunnelPage({
   params,

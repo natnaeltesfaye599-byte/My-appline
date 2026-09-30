@@ -59,6 +59,7 @@ export function ShareInviteModal({
       : `🚀 Join MyUpline Global! Explore our proven network duplication system, certified training, and financial growth. Take the 2-minute qualification check here:`;
 
   const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(telegramShareText)}`;
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${telegramShareText} ${currentUrl}`)}`;
 
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(currentUrl)}&margin=10&color=0c1e3d`;
 
@@ -213,7 +214,7 @@ export function ShareInviteModal({
           </div>
 
           {/* Direct Share Actions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             {/* Telegram 1-Click Share */}
             <a
               href={telegramUrl}
@@ -222,7 +223,18 @@ export function ShareInviteModal({
               className="flex items-center justify-center gap-2 rounded-xl bg-[#229ED9] hover:bg-[#1c8ec4] px-4 py-2.5 text-xs font-bold text-white shadow-md transition hover:scale-[1.02]"
             >
               <Send className="h-4 w-4" />
-              Share to Telegram
+              Telegram
+            </a>
+
+            {/* WhatsApp 1-Click Share */}
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#1daa54] px-4 py-2.5 text-xs font-bold text-white shadow-md transition hover:scale-[1.02]"
+            >
+              <Send className="h-4 w-4" />
+              WhatsApp
             </a>
 
             {/* Native Mobile Share / Open Preview */}
@@ -231,7 +243,7 @@ export function ShareInviteModal({
               className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition"
             >
               <ExternalLink className="h-4 w-4 text-brand-blue" />
-              Share / Open Link
+              Share Link
             </button>
           </div>
         </div>

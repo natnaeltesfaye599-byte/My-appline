@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { NetworkStatusIndicator } from "@/components/ui/network-status-indicator";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -43,12 +42,9 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children
 }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="en">
-      <body>
-        {children}
-        <NetworkStatusIndicator />
-      </body>
-    </html>
-  );
+  // Note: <html> and <body> are rendered by app/[locale]/layout.tsx
+  // so that lang attribute is locale-aware (en vs am).
+  // This root layout only provides metadata and global CSS.
+  return children;
 }
+

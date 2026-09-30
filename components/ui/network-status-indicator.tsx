@@ -12,23 +12,26 @@ export function NetworkStatusIndicator() {
     if (typeof window === "undefined") return;
 
     setIsOnline(navigator.onLine);
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
     function handleOnline() {
       setIsOnline(true);
       setShowReconnected(true);
-      const timer = setTimeout(() => setShowReconnected(false), 3500);
-      return () => clearTimeout(timer);
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => setShowReconnected(false), 3500);
     }
 
     function handleOffline() {
       setIsOnline(false);
       setShowReconnected(false);
+      if (timer) clearTimeout(timer);
     }
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
     return () => {
+      if (timer) clearTimeout(timer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };

@@ -24,7 +24,7 @@ interface WelcomeBannerProps {
   onOpenShare?: () => void;
 }
 
-const kpiItems = [
+const adminKpiItems = [
   { icon: Users, label: "Total Members", value: "12,458", change: "+12.5%", color: "text-cyan-300" },
   { icon: TrendingUp, label: "Active Members", value: "8,642", change: "+8.2%", color: "text-emerald-300" },
   { icon: CircleDollarSign, label: "Monthly Revenue", value: "ETB 2.45M", change: "+15.7%", color: "text-amber-300" },
@@ -34,6 +34,36 @@ const kpiItems = [
   { icon: Flame, label: "New Registrations", value: "89", change: "+5.6%", color: "text-orange-300" },
   { icon: Zap, label: "Pending Payments", value: "23", change: "Needs review", color: "text-yellow-300" }
 ];
+
+const teamLeaderKpiItems = [
+  { icon: Users, label: "My Team Members", value: "47", change: "+3 this week", color: "text-cyan-300" },
+  { icon: Activity, label: "Team DMO Today", value: "82%", change: "+14%", color: "text-emerald-300" },
+  { icon: CircleDollarSign, label: "Team GV This Month", value: "ETB 84K", change: "+9.3%", color: "text-amber-300" },
+  { icon: GraduationCap, label: "Trainings Completed", value: "31", change: "+5", color: "text-purple-300" },
+  { icon: Network, label: "Active Downlines", value: "18", change: "+2", color: "text-blue-300" },
+  { icon: Flame, label: "New Recruits", value: "4", change: "This month", color: "text-orange-300" },
+  { icon: TrendingUp, label: "Team Conversion Rate", value: "68%", change: "+6%", color: "text-rose-300" },
+  { icon: Zap, label: "Pending Follow-Ups", value: "7", change: "In pipeline", color: "text-yellow-300" }
+];
+
+const memberKpiItems = [
+  { icon: Activity, label: "My DMO Score Today", value: "5/7", change: "Keep going!", color: "text-cyan-300" },
+  { icon: Users, label: "My Downline", value: "8", change: "+1 this week", color: "text-emerald-300" },
+  { icon: CircleDollarSign, label: "Personal GV", value: "ETB 12,450", change: "+8.2%", color: "text-amber-300" },
+  { icon: GraduationCap, label: "Courses Completed", value: "4/12", change: "+1 this month", color: "text-purple-300" },
+  { icon: Network, label: "Active Contacts", value: "23", change: "In name list", color: "text-blue-300" },
+  { icon: Flame, label: "Prospect Invites", value: "3", change: "This week", color: "text-orange-300" },
+  { icon: TrendingUp, label: "Goal Progress", value: "62%", change: "30-day goal", color: "text-rose-300" },
+  { icon: Zap, label: "Streak", value: "9 days", change: "Keep it up!", color: "text-yellow-300" }
+];
+
+function getKpiItems(role?: string) {
+  const r = role?.toUpperCase() ?? "";
+  if (r === "SUPER_ADMIN" || r === "ADMIN") return adminKpiItems;
+  if (r === "TEAM_LEADER") return teamLeaderKpiItems;
+  return memberKpiItems;
+}
+
 
 function getGreeting(hour: number): string {
   if (hour < 12) return "Good morning";
@@ -59,6 +89,7 @@ export function WelcomeBanner({
   onOpenAi,
   onOpenShare
 }: WelcomeBannerProps) {
+  const kpiItems = getKpiItems(userRole);
   const [tickerIdx, setTickerIdx] = useState(0);
   const [hour, setHour] = useState(new Date().getHours());
   const [dateStr, setDateStr] = useState(getEthiopianDate());
@@ -68,7 +99,7 @@ export function WelcomeBanner({
       setTickerIdx((i) => (i + 1) % kpiItems.length);
     }, 3500);
     return () => clearInterval(interval);
-  }, []);
+  }, [kpiItems.length]);
 
   useEffect(() => {
     const tick = setInterval(() => {
@@ -80,7 +111,7 @@ export function WelcomeBanner({
 
   const greeting = getGreeting(hour);
   const displayName = userName ? userName.split(" ")[0] : "Leader";
-  const currentKpi = kpiItems[tickerIdx];
+  const currentKpi = kpiItems[tickerIdx % kpiItems.length];
   const KpiIcon = currentKpi.icon;
 
   return (
