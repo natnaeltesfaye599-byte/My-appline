@@ -539,8 +539,9 @@ export function TrainingHub({
       </div>
 
       {/* 3. LEVEL SWITCHER: BASIC vs ADVANCED */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
-        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1">
+      <div className="flex flex-col gap-3 border-b border-slate-200 pb-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 w-fit">
           <button
             onClick={() => {
               setLevelTab("Basic");
@@ -549,14 +550,15 @@ export function TrainingHub({
               setQuizSubmitted(false);
             }}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-5 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition whitespace-nowrap",
               levelTab === "Basic"
                 ? "brand-gradient text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             )}
           >
             <BookOpen className="h-4 w-4" />
-            Basic Training (NBO + Fundamentals)
+            <span className="hidden sm:inline">Basic Training (NBO + Fundamentals)</span>
+            <span className="sm:hidden">Basic Training</span>
           </button>
           <button
             onClick={() => {
@@ -566,15 +568,17 @@ export function TrainingHub({
               setQuizSubmitted(false);
             }}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-5 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition whitespace-nowrap",
               levelTab === "Advanced"
                 ? "brand-gradient text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             )}
           >
             <Trophy className="h-4 w-4" />
-            Advanced Training (Objections & Leadership)
+            <span className="hidden sm:inline">Advanced Training (Objections & Leadership)</span>
+            <span className="sm:hidden">Advanced</span>
           </button>
+        </div>
         </div>
 
         {/* Certificate shortcut badge */}

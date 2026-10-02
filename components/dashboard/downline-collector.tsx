@@ -349,7 +349,7 @@ export function DownlineCollector({
 
       {/* Filter & Search Bar */}
       <Card className="p-4 border-slate-200 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-1 items-center gap-3 min-w-[260px]">
+        <div className="flex w-full items-center gap-3 sm:flex-1 sm:min-w-[260px]">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input

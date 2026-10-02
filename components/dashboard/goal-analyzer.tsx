@@ -135,7 +135,7 @@ export function GoalAnalyzer({ onOpenAi }: { onOpenAi?: (prompt: string) => void
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-navy via-brand-deep to-[#0e3b82] p-6 text-white shadow-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-navy via-brand-deep to-[#0e3b82] p-4 sm:p-6 text-white shadow-xl">
         <div className="max-w-xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-brand-cyan/30 bg-brand-cyan/10 px-3 py-1 text-xs font-semibold text-brand-cyan">
             <Target className="h-3.5 w-3.5" />
@@ -354,20 +354,20 @@ export function GoalAnalyzer({ onOpenAi }: { onOpenAi?: (prompt: string) => void
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         {/* Left: Goals List */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               <h3 className="text-base font-bold text-brand-navy">Active Target Goals</h3>
               <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">
                 {filteredGoals.length}
               </span>
             </div>
-            <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1 text-xs font-semibold text-slate-600">
+            <div className="flex overflow-x-auto scrollbar-none gap-1 rounded-lg border border-slate-200 bg-white p-1 text-xs font-semibold text-slate-600">
               {["all", "recruitment", "sales", "team"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setFilter(tab)}
                   className={cn(
-                    "rounded px-2.5 py-1 capitalize transition",
+                    "shrink-0 rounded px-2.5 py-1 capitalize transition whitespace-nowrap",
                     filter === tab ? "brand-gradient text-brand-navy font-bold" : "hover:bg-slate-50"
                   )}
                 >

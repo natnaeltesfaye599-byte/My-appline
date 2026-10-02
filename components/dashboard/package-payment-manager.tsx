@@ -580,7 +580,7 @@ export function PackagePaymentManager({
       {activeTab === "payments" && (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="relative flex-1 min-w-[240px]">
+            <div className="relative w-full sm:flex-1 sm:min-w-[240px]">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 value={searchQuery}

@@ -405,50 +405,53 @@ export function DailyActivityTracker({
       </Card>
 
       {/* 3. VIEW TABS: Tracker Entry | As Per Target Graph | Show Result for Upline */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1">
+      <div className="flex flex-col gap-2 border-b border-slate-200 pb-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab("tracker")}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition",
               activeTab === "tracker"
                 ? "bg-white text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             )}
           >
             <Activity className="h-3.5 w-3.5 text-brand-blue" />
-            4 Basic Actions Log
+            <span className="hidden sm:inline">4 Basic Actions Log</span>
+            <span className="sm:hidden">Actions</span>
           </button>
           <button
             onClick={() => setActiveTab("graph")}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition",
               activeTab === "graph"
                 ? "bg-white text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             )}
           >
             <BarChart2 className="h-3.5 w-3.5 text-emerald-600" />
-            As Per Target Graph
+            <span className="hidden sm:inline">As Per Target Graph</span>
+            <span className="sm:hidden">Graph</span>
           </button>
           <button
             onClick={() => setActiveTab("upline-report")}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition",
               activeTab === "upline-report"
                 ? "bg-white text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             )}
           >
             <Users className="h-3.5 w-3.5 text-amber-500" />
-            Show Result for Upline
+            <span className="hidden sm:inline">Show Result for Upline</span>
+            <span className="sm:hidden">Upline</span>
           </button>
         </div>
 
         {/* Overall Score Badge */}
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-slate-500 hidden sm:inline">
-            Today's Adherence:
+          <span className="text-xs font-bold text-slate-500">
+            Adherence:
           </span>
           <span
             className={cn(
@@ -793,7 +796,8 @@ export function DailyActivityTracker({
                 <span className="font-semibold text-slate-500">Dashed line = Target (10)</span>
               </div>
 
-              <div className="grid grid-cols-7 gap-2 items-end h-40 bg-slate-50 rounded-xl p-4 border border-slate-200 relative">
+              <div className="overflow-x-auto">
+              <div className="grid grid-cols-7 gap-2 items-end h-40 bg-slate-50 rounded-xl p-4 border border-slate-200 relative min-w-[340px]">
                 {/* Horizontal Target Line at 10 */}
                 <div className="absolute left-0 right-0 top-[35%] border-b border-dashed border-emerald-500/70 z-10 pointer-events-none">
                   <span className="absolute right-2 -top-4 text-[10px] font-bold text-emerald-700 bg-white px-1.5 py-0.2 rounded border border-emerald-200 shadow-sm">
@@ -821,6 +825,7 @@ export function DailyActivityTracker({
                   );
                 })}
               </div>
+              </div>
             </div>
 
             {/* 2. Presentations Completed vs Target (2 presentations baseline) */}
@@ -830,7 +835,8 @@ export function DailyActivityTracker({
                 <span className="font-semibold text-slate-500">Dashed line = Target (2)</span>
               </div>
 
-              <div className="grid grid-cols-7 gap-2 items-end h-36 bg-slate-50 rounded-xl p-4 border border-slate-200 relative">
+              <div className="overflow-x-auto">
+              <div className="grid grid-cols-7 gap-2 items-end h-36 bg-slate-50 rounded-xl p-4 border border-slate-200 relative min-w-[340px]">
                 {/* Horizontal Target Line at 2 */}
                 <div className="absolute left-0 right-0 top-[33%] border-b border-dashed border-brand-blue/70 z-10 pointer-events-none">
                   <span className="absolute right-2 -top-4 text-[10px] font-bold text-brand-blue bg-white px-1.5 py-0.2 rounded border border-cyan-200 shadow-sm">
@@ -857,6 +863,7 @@ export function DailyActivityTracker({
                     </div>
                   );
                 })}
+              </div>
               </div>
             </div>
           </div>

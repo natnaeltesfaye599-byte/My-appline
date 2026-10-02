@@ -413,18 +413,19 @@ export function RecruitmentPipeline({
       </div>
 
       {/* TAB SWITCHER */}
-      <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 w-fit flex-wrap">
+      <div className="overflow-x-auto scrollbar-none">
+      <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 w-fit">
         {[
           { id: "pipeline", label: "Pipeline & Links", icon: Users },
-          { id: "qualifier-funnel", label: "Qualifier Funnel (9 Questions)", icon: Sparkles },
-          { id: "presentation", label: "Presentation Data", icon: Video },
-          { id: "followup", label: "Follow-up Text Marketing", icon: MessageSquare }
+          { id: "qualifier-funnel", label: "Qualifier Funnel", icon: Sparkles },
+          { id: "presentation", label: "Presentations", icon: Video },
+          { id: "followup", label: "Follow-up SMS", icon: MessageSquare }
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id as typeof activeTab)}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-black transition whitespace-nowrap",
               activeTab === id
                 ? "bg-white text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
@@ -435,6 +436,7 @@ export function RecruitmentPipeline({
           </button>
         ))}
       </div>
+      </div>
 
       {/* ============================== */}
       {/* TAB 1: PIPELINE & SEND LINKS  */}
@@ -443,7 +445,7 @@ export function RecruitmentPipeline({
         <>
           {/* Search & Filter */}
           <Card className="p-4 border-slate-200 flex flex-wrap items-center gap-4">
-            <div className="relative flex-1 min-w-[220px]">
+            <div className="relative w-full sm:flex-1 sm:min-w-[220px]">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 value={searchQuery}

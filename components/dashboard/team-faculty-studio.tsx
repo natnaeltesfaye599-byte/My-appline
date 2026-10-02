@@ -1045,7 +1045,7 @@ export function TeamFacultyStudio({
 
           {/* Filter Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
-            <div className="relative flex-1 min-w-[220px] max-w-sm">
+            <div className="relative w-full sm:flex-1 sm:max-w-sm">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"

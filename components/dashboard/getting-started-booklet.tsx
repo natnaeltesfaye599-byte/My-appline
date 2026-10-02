@@ -1043,7 +1043,7 @@ export function GettingStartedBooklet({
               {/* The Power of 2 Duplication Model */}
               <div className="rounded-xl border border-slate-800 bg-[#051124] p-4 space-y-2">
                 <h4 className="text-xs font-black uppercase text-cyan-300">The Power of 2 Duplication Matrix</h4>
-                <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-xs">
                   <div className="rounded bg-white/5 p-2">
                     <span className="text-slate-400 block text-[10px]">Month 1</span>
                     <strong className="text-white">You + 2 = 2</strong>
