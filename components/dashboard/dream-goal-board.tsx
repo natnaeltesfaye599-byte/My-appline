@@ -265,7 +265,7 @@ export function DreamGoalBoard({
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-navy via-brand-deep to-[#0e3b82] p-6 text-white shadow-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-navy via-brand-deep to-[#0e3b82] p-4 sm:p-6 text-white shadow-xl">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300">
             <Sparkles className="h-3.5 w-3.5" />
@@ -360,43 +360,46 @@ export function DreamGoalBoard({
       </div>
 
       {/* View Switcher: Split Side-by-Side vs Dedicated Dream / Goal */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1">
+      <div className="flex flex-col gap-2 border-b border-slate-200 pb-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab("split")}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition",
               activeTab === "split"
                 ? "bg-white text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             )}
           >
             <Compass className="h-3.5 w-3.5 text-brand-blue" />
-            Side-by-Side (Dream | Goal)
+            <span className="hidden sm:inline">Side-by-Side (Dream | Goal)</span>
+            <span className="sm:hidden">Split</span>
           </button>
           <button
             onClick={() => setActiveTab("dream")}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition",
               activeTab === "dream"
                 ? "bg-white text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             )}
           >
             <Star className="h-3.5 w-3.5 text-amber-500" />
-            Dream Board ({dreams.length})
+            <span className="hidden sm:inline">Dream Board ({dreams.length})</span>
+            <span className="sm:hidden">Dreams ({dreams.length})</span>
           </button>
           <button
             onClick={() => setActiveTab("goal")}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black transition",
+              "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-black transition",
               activeTab === "goal"
                 ? "bg-white text-brand-navy shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             )}
           >
             <Target className="h-3.5 w-3.5 text-emerald-600" />
-            Goal Board ({goals.length})
+            <span className="hidden sm:inline">Goal Board ({goals.length})</span>
+            <span className="sm:hidden">Goals ({goals.length})</span>
           </button>
         </div>
 
