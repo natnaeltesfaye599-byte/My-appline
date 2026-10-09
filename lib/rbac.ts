@@ -29,7 +29,10 @@ export type DashboardView =
   | "cms-studio"
   | "team-faculty"
   | "profile"
-  | "onboarding-studio";
+  | "onboarding-studio"
+  | "mlm-engine"
+  | "holding-tank"
+  | "rank-advancement";
 
 // Role mapping from URL slug to Role enum
 export const roleSlugToRoleMap: Record<string, SystemRole> = {
@@ -70,6 +73,9 @@ export const roleAllowedWorkspaces: Record<SystemRole, string[]> = {
 export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
   SUPER_ADMIN: [
     "dashboard",
+    "mlm-engine",
+    "holding-tank",
+    "rank-advancement",
     "recruitment",
     "after-sales",
     "daily-activity",
@@ -96,6 +102,9 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
   ],
   ADMIN: [
     "dashboard",
+    "mlm-engine",
+    "holding-tank",
+    "rank-advancement",
     "recruitment",
     "after-sales",
     "daily-activity",
@@ -117,6 +126,9 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
   ],
   TEAM_LEADER: [
     "dashboard",
+    "mlm-engine",
+    "holding-tank",
+    "rank-advancement",
     "recruitment",
     "after-sales",
     "daily-activity",
@@ -134,6 +146,7 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
   ],
   TRAINER: [
     "dashboard",
+    "rank-advancement",
     "training-hub",
     "genealogy-tree",
     "compliance-rules",
@@ -145,6 +158,8 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
   ],
   MEMBER: [
     "dashboard",
+    "rank-advancement",
+    "holding-tank",
     "recruitment",
     "after-sales",
     "daily-activity",

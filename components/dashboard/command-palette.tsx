@@ -8,6 +8,8 @@ import {
   ClipboardCheck,
   Compass,
   CreditCard,
+  Clock,
+  Crown,
   FileBarChart,
   GraduationCap,
   Globe,
@@ -47,6 +49,9 @@ interface CommandPaletteProps {
 
 const navItems = [
   { id: "dashboard", label: "Dashboard", description: "Overview & KPIs", icon: LayoutDashboard, keywords: ["home", "overview"] },
+  { id: "mlm-engine", label: "MLM Hybrid Compensation Engine", description: "Hybrid Binary-Unilevel plan & batch simulator", icon: Network, keywords: ["mlm", "binary", "unilevel", "plan", "commission", "simulator", "payout"] },
+  { id: "holding-tank", label: "Holding Tank (72h Placements)", description: "72-hour strategic spillover positioning", icon: Clock, keywords: ["tank", "holding", "placement", "spillover", "position", "leg"] },
+  { id: "rank-advancement", label: "Rank Advancement & Career Ladder", description: "7 career tiers & 60/40 volume rules", icon: Crown, keywords: ["rank", "advancement", "ladder", "crown", "diamond", "qualification", "perks"] },
   { id: "recruitment", label: "Recruitment Pipeline", description: "Manage leads & prospects", icon: UserCheck, keywords: ["leads", "funnel", "pipeline"] },
   { id: "after-sales", label: "Getting Started Booklet", description: "6-page onboarding form", icon: ClipboardCheck, keywords: ["booklet", "onboarding", "form", "new member"] },
   { id: "daily-activity", label: "Daily Activity & KPI", description: "DMO scheduler & tracker", icon: Activity, keywords: ["dmo", "activity", "tracker", "kpi"] },

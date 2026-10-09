@@ -395,7 +395,10 @@ export function getNavLabel(locale: string, navId: string): string {
     settings: dict.nav.settings,
     activity: dict.nav.activity,
     profile: (dict.nav as unknown as Record<string, string>).profile || "Profile & Avatars",
-    "onboarding-studio": (dict.nav as unknown as Record<string, string>).onboardingStudio || "Booklet & Funnel Studio (CRUD)"
+    "onboarding-studio": (dict.nav as unknown as Record<string, string>).onboardingStudio || "Booklet & Funnel Studio (CRUD)",
+    "mlm-engine": locale === "am" ? "MLM ሲስተም እና ኮሚሽን ሞተር" : "MLM System & Compensation Engine",
+    "holding-tank": locale === "am" ? "የአዲስ አባላት ምደባ (Holding Tank)" : "Holding Tank & Placements",
+    "rank-advancement": locale === "am" ? "የደረጃ እድገት እና ብቃት" : "Rank Advancement & Career Ladder"
   };
   return map[navId] || navId;
 }

@@ -76,6 +76,9 @@ import { TeamFacultyStudio } from "@/components/dashboard/team-faculty-studio";
 import { SettingsStudio } from "@/components/dashboard/settings-studio";
 import { ProfileManagementModule } from "@/components/dashboard/profile-management-module";
 import { OnboardingProspectStudio } from "@/components/dashboard/onboarding-prospect-studio";
+import { MlmSystemEngine } from "@/components/dashboard/mlm-system-engine";
+import { HoldingTankManager } from "@/components/dashboard/holding-tank-manager";
+import { RankAdvancementTracker } from "@/components/dashboard/rank-advancement-tracker";
 import { AiAssistantModal } from "@/components/dashboard/ai-assistant";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { CommandPalette } from "@/components/dashboard/command-palette";
@@ -97,6 +100,9 @@ import {
 
 export type DashboardView =
   | "dashboard"
+  | "mlm-engine"
+  | "holding-tank"
+  | "rank-advancement"
   | "recruitment"
   | "after-sales"
   | "daily-activity"
@@ -128,6 +134,9 @@ const superAdminNavigation: {
   badge?: string;
 }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "mlm-engine", label: "MLM Hybrid Engine", icon: Network, badge: "Hybrid-Best" },
+  { id: "holding-tank", label: "Holding Tank (72h)", icon: Clock, badge: "Spillover" },
+  { id: "rank-advancement", label: "Rank & Career Ladder", icon: Crown, badge: "7-Tiers" },
   { id: "recruitment", label: "Recruitment", icon: UserCheck, badge: "Pipeline" },
   { id: "after-sales", label: "Getting Started Form", icon: ClipboardCheck, badge: "Breakthrough" },
   { id: "daily-activity", label: "Daily Activity & KPI", icon: Activity, badge: "DMO" },
@@ -155,6 +164,9 @@ const superAdminNavigation: {
 
 const genericNavigation = [
   { id: "dashboard", label: "Overview", icon: LayoutDashboard },
+  { id: "mlm-engine", label: "MLM Hybrid Engine", icon: Network, badge: "Hybrid-Best" },
+  { id: "holding-tank", label: "Holding Tank (72h)", icon: Clock, badge: "Spillover" },
+  { id: "rank-advancement", label: "Rank & Career Ladder", icon: Crown, badge: "7-Tiers" },
   { id: "recruitment", label: "Recruitment", icon: UserCheck, badge: "Pipeline" },
   { id: "after-sales", label: "Getting Started Form", icon: ClipboardCheck, badge: "Breakthrough" },
   { id: "daily-activity", label: "Daily Activity & KPI", icon: Activity, badge: "DMO" },
@@ -939,6 +951,9 @@ function SuperAdminWorkspace({
                   variant="ghost"
                   onClick={() => {
                     const sectionMap: Record<string, string> = {
+                      "mlm-engine": "mlm-system-engine-printable",
+                      "holding-tank": "holding-tank-printable",
+                      "rank-advancement": "rank-advancement-printable",
                       "reports": "reports-center-printable",
                       "downline": "downline-table-printable",
                       "genealogy-tree": "genealogy-tree-printable",
@@ -1013,6 +1028,9 @@ function SuperAdminWorkspace({
               </div>
             ) : null}
             {view === "recruitment" ? <RecruitmentPipeline onOpenAi={handleOpenAi} /> : null}
+            {view === "mlm-engine" ? <MlmSystemEngine onOpenAi={handleOpenAi} /> : null}
+            {view === "holding-tank" ? <HoldingTankManager onOpenAi={handleOpenAi} /> : null}
+            {view === "rank-advancement" ? <RankAdvancementTracker onOpenAi={handleOpenAi} /> : null}
             {view === "after-sales" ? <AfterSalesOnboarding onOpenAi={handleOpenAi} /> : null}
             {view === "daily-activity" ? <DailyActivityTracker onOpenAi={handleOpenAi} /> : null}
             {view === "name-list" ? <NameListOrganizer onOpenAi={handleOpenAi} /> : null}
@@ -1330,6 +1348,9 @@ function GenericDashboard({
                   variant="ghost"
                   onClick={() => {
                     const sectionMap: Record<string, string> = {
+                      "mlm-engine": "mlm-system-engine-printable",
+                      "holding-tank": "holding-tank-printable",
+                      "rank-advancement": "rank-advancement-printable",
                       "reports": "reports-center-printable",
                       "downline": "downline-table-printable",
                       "genealogy-tree": "genealogy-tree-printable",
@@ -1436,6 +1457,9 @@ function GenericDashboard({
             ) : null}
 
             {view === "recruitment" ? <RecruitmentPipeline onOpenAi={handleOpenAi} /> : null}
+            {view === "mlm-engine" ? <MlmSystemEngine onOpenAi={handleOpenAi} /> : null}
+            {view === "holding-tank" ? <HoldingTankManager onOpenAi={handleOpenAi} /> : null}
+            {view === "rank-advancement" ? <RankAdvancementTracker onOpenAi={handleOpenAi} /> : null}
             {view === "after-sales" ? <AfterSalesOnboarding onOpenAi={handleOpenAi} /> : null}
             {view === "daily-activity" ? <DailyActivityTracker onOpenAi={handleOpenAi} /> : null}
             {view === "name-list" ? <NameListOrganizer onOpenAi={handleOpenAi} /> : null}
