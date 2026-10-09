@@ -23,6 +23,8 @@ import {
   UserRound,
   UsersRound,
   Image as ImageIcon,
+  Scale,
+  WalletCards,
   X,
   Zap
 } from "lucide-react";
@@ -53,6 +55,9 @@ const navItems = [
   { id: "dream-goal-board", label: "Dream & Goal Board", description: "Vision board & goals", icon: Compass, keywords: ["dream", "vision", "goals", "board"] },
   { id: "goal-analyzer", label: "Data Analyzer (Goals)", description: "Analytics & goal tracking", icon: Target, keywords: ["analytics", "goals", "data"] },
   { id: "downline", label: "Downline Collector", description: "L1-L3 team network", icon: Network, keywords: ["downline", "team", "network", "levels"] },
+  { id: "genealogy-tree", label: "Genealogy Tree (Matrix)", description: "Visual binary tree & power leg volume", icon: Network, keywords: ["tree", "genealogy", "binary", "matrix", "spillover", "legs"] },
+  { id: "commission-engine", label: "Commissions & Payout Wallet", description: "6 bonus streams & payout cashout", icon: WalletCards, keywords: ["commission", "bonus", "wallet", "payout", "cycles", "earnings"] },
+  { id: "compliance-rules", label: "Regulatory & 70% Rule Compliance", description: "DSA & FTC anti-pyramid audit", icon: Scale, keywords: ["compliance", "dsa", "ftc", "legal", "70%", "audit", "buyback"] },
   { id: "promo-studio", label: "Promotional Photo", description: "Flyers & promotional content", icon: ImageIcon, keywords: ["flyer", "photo", "promo", "design"] },
   { id: "packages-payments", label: "Packages & Payments", description: "Payment verification", icon: CreditCard, keywords: ["payment", "package", "verify", "approve"] },
   { id: "training-studio", label: "Training Studio (CRUD)", description: "Manage courses & trainers", icon: GraduationCap, keywords: ["courses", "manage", "crud"] },

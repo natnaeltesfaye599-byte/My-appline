@@ -46,6 +46,7 @@ import {
   ShieldAlert,
   ClipboardCheck,
   Sliders,
+  Scale,
   Share2
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
@@ -65,6 +66,9 @@ import { PromotionalStudio } from "@/components/dashboard/promotional-studio";
 import { MotivationalQuotesWidget } from "@/components/dashboard/motivational-quotes";
 import { RecognitionCertificates } from "@/components/dashboard/recognition-certificates";
 import { DownlineCollector } from "@/components/dashboard/downline-collector";
+import { GenealogyTreeVisualizer } from "@/components/dashboard/genealogy-tree-visualizer";
+import { CommissionCompensationEngine } from "@/components/dashboard/commission-compensation-engine";
+import { ComplianceRulesMonitor } from "@/components/dashboard/compliance-rules-monitor";
 import { PackagePaymentManager } from "@/components/dashboard/package-payment-manager";
 import { TrainingManagementStudio } from "@/components/dashboard/training-management-studio";
 import { CmsBlogStudio } from "@/components/dashboard/cms-blog-studio";
@@ -101,6 +105,9 @@ export type DashboardView =
   | "dream-goal-board"
   | "goal-analyzer"
   | "downline"
+  | "genealogy-tree"
+  | "commission-engine"
+  | "compliance-rules"
   | "promo-studio"
   | "certificates"
   | "motivational-quotes"
@@ -129,6 +136,9 @@ const superAdminNavigation: {
   { id: "dream-goal-board", label: "Dream & Goal Board", icon: Compass, badge: "Vision" },
   { id: "goal-analyzer", label: "Data Analyzer (Goals)", icon: Target, badge: "New" },
   { id: "downline", label: "Downline Collector", icon: Network, badge: "L1-L3" },
+  { id: "genealogy-tree", label: "Genealogy Tree (Matrix)", icon: Network, badge: "Binary/Uni" },
+  { id: "commission-engine", label: "Commissions & Wallet", icon: WalletCards, badge: "Wallet" },
+  { id: "compliance-rules", label: "Regulatory Compliance", icon: Scale, badge: "DSA/FTC" },
   { id: "promo-studio", label: "Promotional Photo", icon: ImageIcon, badge: "Flyers" },
   { id: "packages-payments", label: "Packages & Approvals", icon: CreditCard, badge: "Verify" },
   { id: "training-studio", label: "Training Studio (CRUD)", icon: GraduationCap, badge: "Faculty" },
@@ -153,6 +163,9 @@ const genericNavigation = [
   { id: "dream-goal-board", label: "Dream & Goal Board", icon: Compass, badge: "Vision" },
   { id: "goal-analyzer", label: "Data Analyzer (Goals)", icon: Target, badge: "New" },
   { id: "downline", label: "Downline Collector", icon: Network, badge: "L1-L3" },
+  { id: "genealogy-tree", label: "Genealogy Tree (Matrix)", icon: Network, badge: "Binary/Uni" },
+  { id: "commission-engine", label: "Commissions & Wallet", icon: WalletCards, badge: "Wallet" },
+  { id: "compliance-rules", label: "Regulatory Compliance", icon: Scale, badge: "DSA/FTC" },
   { id: "promo-studio", label: "Promotional Photo", icon: ImageIcon, badge: "Flyers" },
   { id: "certificates", label: "Certificates", icon: Award },
   { id: "motivational-quotes", label: "Daily Motivation", icon: Quote },
@@ -928,6 +941,9 @@ function SuperAdminWorkspace({
                     const sectionMap: Record<string, string> = {
                       "reports": "reports-center-printable",
                       "downline": "downline-table-printable",
+                      "genealogy-tree": "genealogy-tree-printable",
+                      "commission-engine": "commission-engine-printable",
+                      "compliance-rules": "compliance-rules-printable",
                       "name-list": "printable-name-list-area",
                       "recruitment": "recruitment-pipeline-table",
                       "certificates": "certificate-print-area",
@@ -1004,6 +1020,9 @@ function SuperAdminWorkspace({
             {view === "dream-goal-board" ? <DreamGoalBoard onOpenAi={handleOpenAi} /> : null}
             {view === "goal-analyzer" ? <GoalAnalyzer onOpenAi={handleOpenAi} /> : null}
             {view === "downline" ? <DownlineCollector onOpenAi={handleOpenAi} /> : null}
+            {view === "genealogy-tree" ? <GenealogyTreeVisualizer onOpenAi={handleOpenAi} /> : null}
+            {view === "commission-engine" ? <CommissionCompensationEngine onOpenAi={handleOpenAi} /> : null}
+            {view === "compliance-rules" ? <ComplianceRulesMonitor onOpenAi={handleOpenAi} /> : null}
             {view === "promo-studio" ? <PromotionalStudio onOpenAi={handleOpenAi} /> : null}
             {view === "certificates" ? <RecognitionCertificates onOpenAi={handleOpenAi} /> : null}
             {view === "motivational-quotes" ? <MotivationalQuotesWidget onOpenAi={handleOpenAi} isSuperAdmin={true} fullStudio={true} /> : null}
@@ -1313,6 +1332,9 @@ function GenericDashboard({
                     const sectionMap: Record<string, string> = {
                       "reports": "reports-center-printable",
                       "downline": "downline-table-printable",
+                      "genealogy-tree": "genealogy-tree-printable",
+                      "commission-engine": "commission-engine-printable",
+                      "compliance-rules": "compliance-rules-printable",
                       "name-list": "printable-name-list-area",
                       "recruitment": "recruitment-pipeline-table",
                       "certificates": "certificate-print-area",
@@ -1421,6 +1443,9 @@ function GenericDashboard({
             {view === "dream-goal-board" ? <DreamGoalBoard onOpenAi={handleOpenAi} /> : null}
             {view === "goal-analyzer" ? <GoalAnalyzer onOpenAi={handleOpenAi} /> : null}
             {view === "downline" ? <DownlineCollector onOpenAi={handleOpenAi} /> : null}
+            {view === "genealogy-tree" ? <GenealogyTreeVisualizer onOpenAi={handleOpenAi} /> : null}
+            {view === "commission-engine" ? <CommissionCompensationEngine onOpenAi={handleOpenAi} /> : null}
+            {view === "compliance-rules" ? <ComplianceRulesMonitor onOpenAi={handleOpenAi} /> : null}
             {view === "promo-studio" ? <PromotionalStudio onOpenAi={handleOpenAi} /> : null}
             {view === "certificates" ? <RecognitionCertificates onOpenAi={handleOpenAi} /> : null}
             {view === "motivational-quotes" ? <MotivationalQuotesWidget onOpenAi={handleOpenAi} isSuperAdmin={userRole === "SUPER_ADMIN" || userRole === "ADMIN"} fullStudio={true} /> : null}

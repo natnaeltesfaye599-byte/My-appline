@@ -15,6 +15,9 @@ export type DashboardView =
   | "dream-goal-board"
   | "goal-analyzer"
   | "downline"
+  | "genealogy-tree"
+  | "commission-engine"
+  | "compliance-rules"
   | "promo-studio"
   | "certificates"
   | "motivational-quotes"
@@ -75,6 +78,9 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
     "dream-goal-board",
     "goal-analyzer",
     "downline",
+    "genealogy-tree",
+    "commission-engine",
+    "compliance-rules",
     "promo-studio",
     "certificates",
     "motivational-quotes",
@@ -95,6 +101,9 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
     "daily-activity",
     "name-list",
     "training-hub",
+    "genealogy-tree",
+    "commission-engine",
+    "compliance-rules",
     "certificates",
     "promo-studio",
     "packages-payments",
@@ -116,6 +125,9 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
     "dream-goal-board",
     "goal-analyzer",
     "downline",
+    "genealogy-tree",
+    "commission-engine",
+    "compliance-rules",
     "reports",
     "team-faculty",
     "profile"
@@ -123,6 +135,8 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
   TRAINER: [
     "dashboard",
     "training-hub",
+    "genealogy-tree",
+    "compliance-rules",
     "certificates",
     "dream-goal-board",
     "motivational-quotes",
@@ -137,6 +151,9 @@ export const roleAllowedViews: Record<SystemRole, DashboardView[]> = {
     "name-list",
     "training-hub",
     "dream-goal-board",
+    "genealogy-tree",
+    "commission-engine",
+    "compliance-rules",
     "motivational-quotes",
     "profile"
   ]
