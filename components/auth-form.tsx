@@ -34,8 +34,6 @@ import {
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { roles } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
 
 export type AuthFormProps = {
@@ -342,32 +340,6 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
     }
   }
 
-  async function handleDemoLogin(roleSlug: string) {
-    try {
-      const response = await fetch("/api/auth/demo-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roleSlug })
-      });
-      const payload = await response.json();
-
-      if (!response.ok) {
-        setError("Demo login unavailable. Please use the regular sign-in form.");
-        return;
-      }
-
-      if (payload?.data?.accessToken) {
-        window.localStorage.setItem("myupline.accessToken", payload.data.accessToken);
-      }
-      if (payload?.data?.user) {
-        window.localStorage.setItem("myupline.user", JSON.stringify(payload.data.user));
-      }
-      // Use replace so demo login also removes auth page from history
-      router.replace(`/${locale}/dashboard/${roleSlug}`);
-    } catch {
-      setError("Demo login failed. Please try again.");
-    }
-  }
 
 
   return (
@@ -1055,23 +1027,6 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
             </div>
           )}
 
-          {/* Quick Demo Access Pills */}
-          <div className="mt-6 border-t border-slate-800/80 pt-4">
-            <p className="text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Instant 1-Click Demo Access
-            </p>
-            <div className="mt-2 flex flex-wrap justify-center gap-1.5">
-              {roles.map((r) => (
-                <button
-                  key={r.slug}
-                  onClick={() => handleDemoLogin(r.slug)}
-                  className="rounded-lg border border-slate-800 bg-slate-800/40 px-2 py-1 text-[11px] font-semibold text-slate-300 transition hover:border-cyan-400/40 hover:bg-cyan-950/40 hover:text-cyan-300"
-                >
-                  {r.name}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Bottom Prompt */}
           <div className="mt-4 text-center text-xs text-slate-400">
