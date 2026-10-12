@@ -118,6 +118,20 @@
       "lastLoginAt": null,
       "createdAt": "2026-09-03T07:14:45.884Z",
       "updatedAt": "2026-09-03T07:14:45.884Z"
+    },
+    {
+      "id": "usr-c649ccb0",
+      "organizationId": "org-default-01",
+      "email": "test_dev_999@test.com",
+      "phone": "+251999887766",
+      "fullName": "Test User",
+      "passwordHash": "$2b$12$mRNueXwupKrgFTstPzI9UuABxG5ODAO/jUOx/VZVhgJs2AonxTjaC",
+      "role": "MEMBER",
+      "emailVerifiedAt": "2026-10-12T16:47:19.377Z",
+      "profileSetupCompleted": true,
+      "lastLoginAt": "2026-10-12T16:47:19.377Z",
+      "createdAt": "2026-10-12T16:47:19.377Z",
+      "updatedAt": "2026-10-12T16:47:19.377Z"
     }
   ],
   "profiles": [
@@ -290,6 +304,23 @@
       "createdAt": "2026-09-03T07:14:45.884Z",
       "updatedAt": "2026-09-03T07:14:45.884Z",
       "rawPassword": "Member@2026!"
+    },
+    {
+      "id": "prof-82461efc",
+      "userId": "usr-c649ccb0",
+      "firstName": "Test",
+      "lastName": "User",
+      "phone": "+251999887766",
+      "country": "Ethiopia",
+      "region": "Addis Ababa",
+      "city": "Bole",
+      "address": "House 1",
+      "status": "PENDING_VERIFICATION",
+      "rank": "Starter IBO",
+      "referralCode": "UP-45666B",
+      "packageType": "Diamond Leader",
+      "createdAt": "2026-10-12T16:47:19.377Z",
+      "updatedAt": "2026-10-12T16:47:19.377Z"
     }
   ],
   "packages": [
@@ -1032,6 +1063,22 @@
     }
   ],
   "payments": [
+    {
+      "id": "pay-24731c4e",
+      "userId": "usr-c649ccb0",
+      "userName": "Test User",
+      "userEmail": "test_dev_999@test.com",
+      "userPhone": "+251999887766",
+      "packageId": "pkg-diamond",
+      "packageName": "Diamond Leader",
+      "amountETB": 14990,
+      "paymentMethod": "Telebirr",
+      "transactionRef": "TX-123456",
+      "receiptScreenshotUrl": "data:image/png;base64,abc",
+      "status": "PENDING_VERIFICATION",
+      "createdAt": "2026-10-12T16:47:19.386Z",
+      "updatedAt": "2026-10-12T16:47:19.386Z"
+    },
     {
       "id": "pay-7dcf7038",
       "userId": "usr-df2fcec3",

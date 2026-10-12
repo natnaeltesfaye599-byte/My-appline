@@ -115,8 +115,9 @@ export async function middleware(request: NextRequest) {
     }
 
     if (isAuthRoute) {
-      if (user) {
-        // Already logged in — redirect away from auth pages so back button doesn't show login
+      const isSignInRoute = pathname.includes("/auth/sign-in");
+      if (user && isSignInRoute) {
+        // Already logged in — redirect away from sign-in so back button doesn't show login
         const locale = pathname.split("/")[1] || "en";
         const roleSlug = (user.role as string || "member")
           .toLowerCase()
@@ -128,7 +129,7 @@ export async function middleware(request: NextRequest) {
         const redirectResponse = NextResponse.redirect(dashboardUrl);
         return addSecurityHeaders(redirectResponse);
       }
-      // Not logged in — allow auth pages through
+      // Allow sign-up, verify-email, reset-password, and unauthenticated sign-in through
       const response = NextResponse.next();
       return addSecurityHeaders(response);
     }

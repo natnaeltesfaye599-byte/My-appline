@@ -85,15 +85,41 @@ const defaultPackageList: PackageItem[] = [
   }
 ];
 
+const defaultPaymentMethodsFallback = [
+  {
+    id: "pm-cbe-01",
+    name: "Commercial Bank of Ethiopia (CBE)",
+    accountName: "MyUpline Global Technologies",
+    accountNumber: "1000123456789",
+    type: "BANK"
+  },
+  {
+    id: "pm-telebirr-01",
+    name: "Telebirr",
+    accountName: "MyUpline Global Technologies",
+    accountNumber: "0911223344",
+    type: "MOBILE_MONEY"
+  },
+  {
+    id: "pm-abyssinia-01",
+    name: "Bank of Abyssinia",
+    accountName: "MyUpline Global Technologies",
+    accountNumber: "8899223344",
+    type: "BANK"
+  }
+];
+
 export function AuthForm({ locale, mode }: AuthFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const refParam = searchParams.get("ref") ?? "";
   const nextParam = searchParams.get("next") ?? "";
+  const packageParam = searchParams.get("package") ?? "";
 
   const isSignIn = mode === "sign-in";
 
   const [loggedOutNotice, setLoggedOutNotice] = useState(false);
+  const [existingUser, setExistingUser] = useState<{ name?: string; email?: string; role?: string } | null>(null);
 
   // ── Client-side session guard & back-button trap ──
   useEffect(() => {
@@ -110,10 +136,15 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
     if (token && userStr) {
       try {
         const user = JSON.parse(userStr);
-        const roleSlug = (user?.role ?? "MEMBER").toLowerCase().replace(/_/g, "-");
-        // Use replace so auth page is dropped from history
-        router.replace(`/${locale}/dashboard/${roleSlug}`);
-        return;
+        if (isSignIn) {
+          const roleSlug = (user?.role ?? "MEMBER").toLowerCase().replace(/_/g, "-");
+          // Use replace so auth page is dropped from history
+          router.replace(`/${locale}/dashboard/${roleSlug}`);
+          return;
+        } else {
+          // In sign-up mode, retain knowledge of existing user session without blocking sign-up
+          setExistingUser(user);
+        }
       } catch {
         // Corrupted storage — clear it
         window.localStorage.removeItem("myupline.accessToken");
@@ -133,8 +164,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
         window.removeEventListener("popstate", handlePopState);
       };
     } catch {}
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locale]);
+  }, [isSignIn, locale, router]);
 
   // Step state for Sign-Up
   const [step, setStep] = useState<SignUpStep>(1);
@@ -146,19 +176,27 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
   const [referralCode, setReferralCode] = useState(refParam);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Step 2: Contact & Location (matching user screenshot)
-  const [phone, setPhone] = useState("+251 912 345 678");
+  // Step 2: Contact & Location
+  const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("Ethiopia");
   const [region, setRegion] = useState("Addis Ababa");
-  const [city, setCity] = useState("Bole, Addis Ababa");
-  const [address, setAddress] = useState("House No. 123, Woreda 03");
+  const [city, setCity] = useState("Addis Ababa");
+  const [address, setAddress] = useState("");
 
-  // Step 3: Package (loaded dynamically from Super Admin CRUD packages)
+  // Step 3: Package (initialized with URL parameter if provided)
+  const initialPackage = packageParam
+    ? defaultPackageList.find(
+        (p) =>
+          p.id.toLowerCase() === packageParam.toLowerCase() ||
+          p.name.toLowerCase().includes(packageParam.toLowerCase())
+      ) || defaultPackageList[0]
+    : defaultPackageList[0];
+
   const [availablePackages, setAvailablePackages] = useState<PackageItem[]>(defaultPackageList);
-  const [selectedPackage, setSelectedPackage] = useState<PackageItem>(defaultPackageList[0]);
+  const [selectedPackage, setSelectedPackage] = useState<PackageItem>(initialPackage);
 
   // Step 4: Manual Payment & Receipt Screenshot
-  const [configuredMethods, setConfiguredMethods] = useState<any[]>([]);
+  const [configuredMethods, setConfiguredMethods] = useState<any[]>(defaultPaymentMethodsFallback);
   const [paymentMethod, setPaymentMethod] = useState("Commercial Bank of Ethiopia (CBE)");
   const [transactionRef, setTransactionRef] = useState("");
   const [receiptScreenshotUrl, setReceiptScreenshotUrl] = useState<string>("");
@@ -177,6 +215,17 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
       .then((data) => {
         if (data?.data?.packages && data.data.packages.length > 0) {
           setAvailablePackages(data.data.packages);
+          if (packageParam) {
+            const matched = data.data.packages.find(
+              (p: PackageItem) =>
+                p.id.toLowerCase() === packageParam.toLowerCase() ||
+                p.name.toLowerCase().includes(packageParam.toLowerCase())
+            );
+            if (matched) {
+              setSelectedPackage(matched);
+              return;
+            }
+          }
           setSelectedPackage(data.data.packages[0]);
         }
       })
@@ -191,7 +240,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [packageParam]);
 
   function handleCopyAcc(id: string, text: string) {
     navigator.clipboard.writeText(text);
@@ -199,22 +248,58 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
     setTimeout(() => setCopiedAccId(null), 2000);
   }
 
-  // Handle Receipt Screenshot file upload
+  // Handle Receipt Screenshot file upload with automatic client-side compression
   function handleReceiptUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setError("Please upload an image file (PNG, JPG, or WEBP receipt).");
+      setError(
+        locale === "am"
+          ? "እባክዎ ትክክለኛ የምስል ፋይል ይጫኑ (PNG, JPG ወይም WEBP)"
+          : "Please upload an image file (PNG, JPG, or WEBP receipt)."
+      );
       return;
     }
 
     setReceiptFileName(file.name);
+    setError("");
+
     const reader = new FileReader();
     reader.onload = (event) => {
-      const result = event.target?.result as string;
-      setReceiptScreenshotUrl(result);
-      setError("");
+      const rawResult = event.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          const MAX_DIM = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            } else {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL("image/jpeg", 0.75);
+            setReceiptScreenshotUrl(compressed);
+            return;
+          }
+        } catch {}
+        setReceiptScreenshotUrl(rawResult);
+      };
+      img.onerror = () => {
+        setReceiptScreenshotUrl(rawResult);
+      };
+      img.src = rawResult;
     };
     reader.readAsDataURL(file);
   }
@@ -223,15 +308,27 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
   function validateStep1(): boolean {
     setError("");
     if (!name.trim() || name.trim().length < 2) {
-      setError("Please enter your full name (minimum 2 characters).");
+      setError(
+        locale === "am"
+          ? "እባክዎ ሙሉ ስምዎን ያስገቡ (ቢያንስ 2 ፊደላት)።"
+          : "Please enter your full name (minimum 2 characters)."
+      );
       return false;
     }
     if (!email.trim() || !email.includes("@")) {
-      setError("Please enter a valid email address.");
+      setError(
+        locale === "am"
+          ? "እባክዎ ትክክለኛ የኢሜይል አድራሻ ያስገቡ።"
+          : "Please enter a valid email address."
+      );
       return false;
     }
     if (!password || password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(
+        locale === "am"
+          ? "የይለፍ ቃል ቢያንስ 8 ቁምፊዎች መሆን አለበት።"
+          : "Password must be at least 8 characters."
+      );
       return false;
     }
     return true;
@@ -240,11 +337,19 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
   function validateStep2(): boolean {
     setError("");
     if (!phone.trim() || phone.replace(/[^\d]/g, "").length < 7) {
-      setError("Please enter a valid phone number.");
+      setError(
+        locale === "am"
+          ? "እባክዎ ትክክለኛ ስልክ ቁጥር ያስገቡ።"
+          : "Please enter a valid phone number."
+      );
       return false;
     }
     if (!city.trim()) {
-      setError("Please provide your city.");
+      setError(
+        locale === "am"
+          ? "እባክዎ ከተማዎን ያስገቡ።"
+          : "Please provide your city."
+      );
       return false;
     }
     return true;
@@ -252,12 +357,12 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
   function validateStep4(): boolean {
     setError("");
-    if (!transactionRef.trim() || transactionRef.trim().length < 4) {
-      setError("Please provide your bank or mobile transaction reference number.");
-      return false;
-    }
-    if (!receiptScreenshotUrl) {
-      setError("Please submit/upload a screenshot of your payment receipt for Super Admin verification.");
+    if (!transactionRef.trim() || transactionRef.trim().length < 3) {
+      setError(
+        locale === "am"
+          ? "እባክዎ የባንክ ወይም የሞባይል ክፍያ ማረጋገጫ ቁጥር (Transaction Reference) ያስገቡ።"
+          : "Please provide your bank or mobile transaction reference number."
+      );
       return false;
     }
     return true;
@@ -304,15 +409,15 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
             email: email.trim(),
             password,
             phone: phone.trim(),
-            country: country.trim(),
-            region: region.trim(),
-            city: city.trim(),
-            address: address.trim(),
+            country: country.trim() || "Ethiopia",
+            region: region.trim() || "Addis Ababa",
+            city: city.trim() || "Addis Ababa",
+            address: address.trim() || "N/A",
             packageType: selectedPackage.name,
             referralCode: referralCode.trim() || undefined,
             paymentMethod,
             transactionRef: transactionRef.trim(),
-            receiptScreenshotUrl
+            receiptScreenshotUrl: receiptScreenshotUrl || undefined
           })
         });
         const payload = await response.json();
@@ -328,10 +433,15 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
           window.localStorage.setItem("myupline.user", JSON.stringify(payload.data.user));
         }
 
-        setSuccess("Registration & Payment Receipt Submitted! Super Admin will review and approve your receipt.");
+        setSuccess(
+          locale === "am"
+            ? "ምዝገባዎ በተሳካ ሁኔታ ተጠናቋል! ወደ ዳሽቦርድ በመግባት ላይ..."
+            : "Registration completed successfully! Welcome to MyUpline, redirecting..."
+        );
+        const destination = nextParam || `/${locale}/dashboard/member`;
         setTimeout(() => {
-          router.push(`/${locale}/dashboard/member`);
-        }, 1800);
+          router.replace(destination);
+        }, 1200);
       }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "An unexpected error occurred.");
@@ -383,15 +493,21 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
           {/* Header Title */}
           <div className="text-center">
             <h1 className="text-2xl font-black tracking-tight sm:text-3xl text-white">
-              {isSignIn ? "Sign In to MyUpline" : "Create Your Account"}
+              {isSignIn
+                ? locale === "am"
+                  ? "ወደ MyUpline ይግቡ"
+                  : "Sign In to MyUpline"
+                : locale === "am"
+                ? "አዲስ አካውንት ይመዝገቡ"
+                : "Create Your Account"}
             </h1>
             <p className="mt-1.5 text-xs text-slate-400">
-              {isSignIn && "Access your network marketing command center"}
-              {!isSignIn && step === 1 && "Enter your personal & account credentials"}
-              {!isSignIn && step === 2 && "Provide your contact & location details"}
-              {!isSignIn && step === 3 && "Select your enrollment package level"}
-              {!isSignIn && step === 4 && "Submit manual payment & receipt screenshot"}
-              {!isSignIn && step === 5 && "Review your information & finalize"}
+              {isSignIn && (locale === "am" ? "የኔትወርክ ማርኬቲንግ መቆጣጠሪያዎን ይክፈቱ" : "Access your network marketing command center")}
+              {!isSignIn && step === 1 && (locale === "am" ? "የግል እና የመግቢያ መረጃዎን ያስገቡ" : "Enter your personal & account credentials")}
+              {!isSignIn && step === 2 && (locale === "am" ? "የስልክ እና የአድራሻ መረጃዎን ያስገቡ" : "Provide your contact & location details")}
+              {!isSignIn && step === 3 && (locale === "am" ? "የአባልነት ጥቅልዎን ይምረጡ" : "Select your enrollment package level")}
+              {!isSignIn && step === 4 && (locale === "am" ? "ክፍያ ፈጽመው የደረሰኝ ስክሪንሾት ያያይዙ" : "Submit manual payment & receipt screenshot")}
+              {!isSignIn && step === 5 && (locale === "am" ? "መረጃዎን ያረጋግጡና ምዝገባዎን ያጠናቁ" : "Review your information & finalize")}
             </p>
           </div>
 
@@ -435,7 +551,40 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
           {loggedOutNotice && (
             <div className="mb-4 flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3 text-xs font-semibold text-cyan-300 animate-in fade-in">
               <ShieldCheck className="h-4 w-4 shrink-0 text-cyan-400" />
-              <span>You have been securely signed out. Protected workspace access is closed.</span>
+              <span>{locale === "am" ? "በተሳካ ሁኔታ ወጥተዋል።" : "You have been securely signed out. Protected workspace access is closed."}</span>
+            </div>
+          )}
+
+          {/* Active Session Notification (when viewing sign-up while already logged in) */}
+          {existingUser && !isSignIn && (
+            <div className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-cyan-500/30 bg-cyan-950/50 p-3 text-xs text-cyan-200 animate-in fade-in">
+              <div className="flex items-center gap-2 truncate">
+                <User className="h-4 w-4 shrink-0 text-cyan-400" />
+                <span className="truncate">
+                  {locale === "am" ? "የገቡበት አካውንት: " : "Signed in as: "}
+                  <strong className="text-white">{existingUser.name || "Active User"}</strong>
+                </span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Link
+                  href={`/${locale}/dashboard/${(existingUser.role || "MEMBER").toLowerCase().replace(/_/g, "-")}`}
+                  className="rounded-lg bg-cyan-400/20 px-2 py-1 text-[11px] font-bold text-cyan-300 hover:bg-cyan-400/30 transition"
+                >
+                  {locale === "am" ? "ዳሽቦርድ" : "Dashboard"} →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.localStorage.removeItem("myupline.accessToken");
+                    window.localStorage.removeItem("myupline.user");
+                    document.cookie = "myupline_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                    setExistingUser(null);
+                  }}
+                  className="text-[11px] text-slate-400 hover:text-rose-300 underline"
+                >
+                  {locale === "am" ? "ውጣ" : "Sign Out"}
+                </button>
+              </div>
             </div>
           )}
 
@@ -527,10 +676,18 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
           {/* SIGN UP STEP 1: CREDENTIALS               */}
           {/* ========================================= */}
           {!isSignIn && step === 1 && (
-            <div className="space-y-3.5">
+            <div
+              className="space-y-3.5"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (validateStep1()) setStep(2);
+                }
+              }}
+            >
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Full Name
+                  {locale === "am" ? "ሙሉ ስም" : "Full Name"}
                 </label>
                 <div className="relative">
                   <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -539,7 +696,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Solomon Hailu Tadesse"
+                    placeholder={locale === "am" ? "ለምሳሌ፦ ሰለሞን ኃይሉ ታደሰ" : "e.g. Solomon Hailu Tadesse"}
                     className="h-10 w-full rounded-xl border border-slate-700/80 bg-[#06142a]/80 pl-10 pr-3 text-xs text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
                   />
                 </div>
@@ -547,7 +704,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Email Address
+                  {locale === "am" ? "የኢሜይል አድራሻ" : "Email Address"}
                 </label>
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -564,7 +721,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Password (min. 8 characters)
+                  {locale === "am" ? "የይለፍ ቃል (ቢያንስ 8 ፊደላት)" : "Password (min. 8 characters)"}
                 </label>
                 <div className="relative">
                   <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -588,7 +745,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Sponsor Referral Code (Optional)
+                  {locale === "am" ? "የጋባዥ ሪፈራል ኮድ (አስገዳጅ ያልሆነ)" : "Sponsor Referral Code (Optional)"}
                 </label>
                 <div className="relative">
                   <Ticket className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -609,7 +766,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                 }}
                 className="mt-2 h-11 w-full rounded-xl bg-cyan-400 font-black text-brand-navy shadow-lg shadow-cyan-400/25 transition hover:bg-cyan-300"
               >
-                Continue to Location <ArrowRight className="ml-1.5 h-4 w-4" />
+                {locale === "am" ? "ወደ አድራሻ መረጃ ቀጥል" : "Continue to Location"} <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             </div>
           )}
@@ -618,10 +775,18 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
           {/* SIGN UP STEP 2: PHONE & LOCATION (MATCHING IMAGE) */}
           {/* ================================================= */}
           {!isSignIn && step === 2 && (
-            <div className="space-y-3.5">
+            <div
+              className="space-y-3.5"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (validateStep2()) setStep(3);
+                }
+              }}
+            >
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  Phone Number
+                  {locale === "am" ? "ስልክ ቁጥር *" : "Phone Number *"}
                 </label>
                 <div className="relative">
                   <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -630,7 +795,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+251 912 345 678"
+                    placeholder="+251 911 234 567"
                     className="h-10 w-full rounded-xl border border-slate-700/80 bg-[#06142a]/90 pl-10 pr-3 text-xs font-medium text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
                   />
                 </div>
@@ -639,7 +804,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                    Country
+                    {locale === "am" ? "ሀገር" : "Country"}
                   </label>
                   <div className="relative">
                     <Globe className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
@@ -656,7 +821,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
                 <div>
                   <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                    Region / State
+                    {locale === "am" ? "ክልል / ዞን" : "Region / State"}
                   </label>
                   <div className="relative">
                     <MapPin className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
@@ -674,7 +839,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  City
+                  {locale === "am" ? "ከተማ *" : "City *"}
                 </label>
                 <div className="relative">
                   <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -691,7 +856,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  Street / House Address
+                  {locale === "am" ? "የመንገድ ወይም የቤት አድራሻ" : "Street / House Address"}
                 </label>
                 <div className="relative">
                   <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -711,7 +876,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                   onClick={() => setStep(1)}
                   className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/60 text-xs font-bold text-slate-300 transition hover:bg-slate-800 hover:text-white"
                 >
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back
+                  <ArrowLeft className="h-3.5 w-3.5" /> {locale === "am" ? "ተመለስ" : "Back"}
                 </button>
 
                 <button
@@ -721,7 +886,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                   }}
                   className="flex h-11 flex-[1.4] items-center justify-center gap-2 rounded-xl bg-cyan-400 text-xs font-black text-brand-navy shadow-lg shadow-cyan-400/25 transition hover:bg-cyan-300"
                 >
-                  Continue to Packages <ArrowRight className="h-3.5 w-3.5" />
+                  {locale === "am" ? "ወደ ጥቅሎች ቀጥል" : "Continue to Packages"} <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -756,6 +921,11 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                           {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
                         </div>
                         <h4 className="text-xs font-black text-white">{pkg.name}</h4>
+                        {pkg.badge && (
+                          <span className="rounded bg-amber-400/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-300">
+                            {pkg.badge}
+                          </span>
+                        )}
                       </div>
                       <div className="text-right">
                         <span className="text-xs font-black text-cyan-300">
@@ -777,7 +947,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                   onClick={() => setStep(2)}
                   className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/60 text-xs font-bold text-slate-300 transition hover:bg-slate-800 hover:text-white"
                 >
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back
+                  <ArrowLeft className="h-3.5 w-3.5" /> {locale === "am" ? "ተመለስ" : "Back"}
                 </button>
 
                 <button
@@ -785,7 +955,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                   onClick={() => setStep(4)}
                   className="flex h-11 flex-[1.4] items-center justify-center gap-2 rounded-xl bg-cyan-400 text-xs font-black text-brand-navy shadow-lg shadow-cyan-400/25 transition hover:bg-cyan-300"
                 >
-                  Manual Payment <ArrowRight className="h-3.5 w-3.5" />
+                  {locale === "am" ? "ወደ ክፍያ ቀጥል" : "Continue to Payment"} <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -795,12 +965,20 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
           {/* SIGN UP STEP 4: MANUAL PAYMENT & SUBMIT RECEIPT SCREENSHOT */}
           {/* ========================================================== */}
           {!isSignIn && step === 4 && (
-            <div className="space-y-3.5">
+            <div
+              className="space-y-3.5"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (validateStep4()) setStep(5);
+                }
+              }}
+            >
               {/* Configured Company Bank & Mobile Accounts */}
               <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/30 p-3.5 text-xs text-slate-300 space-y-2">
                 <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
                   <span className="font-bold text-cyan-300 flex items-center gap-1.5">
-                    <Coins className="h-4 w-4" /> Transfer Amount:
+                    <Coins className="h-4 w-4" /> {locale === "am" ? "የክፍያ መጠን፦" : "Transfer Amount:"}
                   </span>
                   <span className="font-black text-white text-sm">
                     ETB {selectedPackage.priceETB.toLocaleString()}
@@ -808,11 +986,11 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                 </div>
 
                 <p className="text-[10px] uppercase font-bold text-slate-400">
-                  Select a company payment account to transfer:
+                  {locale === "am" ? "ክፍያውን ወደሚከተሉት የድርጅቱ አካውንቶች ያስገቡ፦" : "Select a company payment account to transfer:"}
                 </p>
 
                 <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
-                  {configuredMethods.map((m) => {
+                  {(configuredMethods.length > 0 ? configuredMethods : defaultPaymentMethodsFallback).map((m) => {
                     const isSelected = paymentMethod === m.name;
                     const isCopied = copiedAccId === m.id;
 
@@ -838,11 +1016,11 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                             className="text-[10px] font-bold text-cyan-300 hover:underline flex items-center gap-1"
                           >
                             {isCopied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
-                            {isCopied ? "Copied" : "Copy"}
+                            {isCopied ? (locale === "am" ? "ተቀድቷል" : "Copied") : (locale === "am" ? "ቅዳ" : "Copy")}
                           </button>
                         </div>
                         <p className="font-mono text-cyan-200 font-bold mt-0.5">{m.accountNumber}</p>
-                        <p className="text-[10px] text-slate-400">Beneficiary: {m.accountName}</p>
+                        <p className="text-[10px] text-slate-400">{locale === "am" ? "ባለቤት፦" : "Beneficiary:"} {m.accountName}</p>
                       </div>
                     );
                   })}
@@ -852,34 +1030,25 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
               {/* Payment Method Select */}
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  Payment Method
+                  {locale === "am" ? "የከፈሉበት መንገድ" : "Payment Method"}
                 </label>
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                   className="h-10 w-full rounded-xl border border-slate-700 bg-[#06142a] px-3 text-xs text-white outline-none focus:border-cyan-400"
                 >
-                  {configuredMethods.length > 0 ? (
-                    configuredMethods.map((m) => (
-                      <option key={m.id} value={m.name}>
-                        {m.name} ({m.accountNumber})
-                      </option>
-                    ))
-                  ) : (
-                    <>
-                      <option>Commercial Bank of Ethiopia (CBE)</option>
-                      <option>Telebirr</option>
-                      <option>Awash Bank</option>
-                      <option>Bank of Abyssinia</option>
-                    </>
-                  )}
+                  {(configuredMethods.length > 0 ? configuredMethods : defaultPaymentMethodsFallback).map((m) => (
+                    <option key={m.id} value={m.name}>
+                      {m.name} ({m.accountNumber})
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Transaction Reference Number */}
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  Transaction Reference Number / TX ID
+                  {locale === "am" ? "የግብይት ማረጋገጫ ቁጥር (Transaction Reference) *" : "Transaction Reference Number / TX ID *"}
                 </label>
                 <input
                   type="text"
@@ -894,52 +1063,67 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
               {/* Submit Screenshot of the Receipt */}
               <div>
                 <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  Submit Screenshot of the Receipt *
+                  {locale === "am" ? "የክፍያ ማረጋገጫ ደረሰኝ (ስክሪንሾት)" : "Submit Screenshot of the Receipt"}
                 </label>
 
-                <label className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cyan-500/40 bg-[#06142a]/80 p-4 text-center cursor-pointer hover:border-cyan-400 hover:bg-cyan-950/20 transition">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleReceiptUpload}
-                    className="sr-only"
-                  />
+                <div className="relative">
+                  <label className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cyan-500/40 bg-[#06142a]/80 p-4 text-center cursor-pointer hover:border-cyan-400 hover:bg-cyan-950/20 transition">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleReceiptUpload}
+                      className="sr-only"
+                    />
 
-                  {receiptScreenshotUrl ? (
-                    <div className="flex items-center gap-3 w-full">
-                      <div className="h-14 w-14 rounded-xl border border-cyan-400/60 overflow-hidden bg-slate-900 shrink-0">
-                        <img
-                          src={receiptScreenshotUrl}
-                          alt="Receipt Preview"
-                          className="h-full w-full object-cover"
-                        />
+                    {receiptScreenshotUrl ? (
+                      <div className="flex items-center gap-3 w-full">
+                        <div className="h-14 w-14 rounded-xl border border-cyan-400/60 overflow-hidden bg-slate-900 shrink-0">
+                          <img
+                            src={receiptScreenshotUrl}
+                            alt="Receipt Preview"
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                        <div className="text-left flex-1 min-w-0">
+                          <p className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> {locale === "am" ? "ደረሰኝ ተያይዟል" : "Screenshot Attached"}
+                          </p>
+                          <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                            {receiptFileName || "receipt_screenshot.png"}
+                          </p>
+                          <span className="text-[10px] text-cyan-300 hover:underline">
+                            {locale === "am" ? "ለመቀየር እዚህ ይጫኑ" : "Click to change screenshot"}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setReceiptScreenshotUrl("");
+                            setReceiptFileName("");
+                          }}
+                          className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-500/20 hover:text-rose-300 transition"
+                          title="Remove screenshot"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
                       </div>
-                      <div className="text-left flex-1 min-w-0">
-                        <p className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                          <CheckCircle2 className="h-3.5 w-3.5" /> Screenshot Attached
+                    ) : (
+                      <>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300 mb-2">
+                          <Upload className="h-5 w-5" />
+                        </div>
+                        <p className="text-xs font-bold text-slate-200">
+                          {locale === "am" ? "ደረሰኝ ይጫኑ (PNG, JPG)" : "Upload Receipt Screenshot"}
                         </p>
-                        <p className="text-[10px] text-slate-400 truncate mt-0.5">
-                          {receiptFileName || "receipt_screenshot.png"}
+                        <p className="text-[10px] text-slate-400 mt-0.5">
+                          {locale === "am" ? "ከሞባይል ባንኪንግ ወይም ቴሌብር የተወሰደ ስክሪንሾት" : "PNG, JPG, or screenshot from banking app"}
                         </p>
-                        <span className="text-[10px] text-cyan-300 hover:underline">
-                          Click to change screenshot
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300 mb-2">
-                        <Upload className="h-5 w-5" />
-                      </div>
-                      <p className="text-xs font-bold text-slate-200">
-                        Upload Receipt Screenshot
-                      </p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        PNG, JPG, or screenshot from banking app
-                      </p>
-                    </>
-                  )}
-                </label>
+                      </>
+                    )}
+                  </label>
+                </div>
               </div>
 
               <div className="flex items-center gap-3 pt-2">
@@ -948,7 +1132,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                   onClick={() => setStep(3)}
                   className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/60 text-xs font-bold text-slate-300 transition hover:bg-slate-800 hover:text-white"
                 >
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back
+                  <ArrowLeft className="h-3.5 w-3.5" /> {locale === "am" ? "ተመለስ" : "Back"}
                 </button>
 
                 <button
@@ -958,7 +1142,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                   }}
                   className="flex h-11 flex-[1.4] items-center justify-center gap-2 rounded-xl bg-cyan-400 text-xs font-black text-brand-navy shadow-lg shadow-cyan-400/25 transition hover:bg-cyan-300"
                 >
-                  Review Details <ArrowRight className="h-3.5 w-3.5" />
+                  {locale === "am" ? "መረጃዎን ያረጋግጡ" : "Review Details"} <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -971,31 +1155,41 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
             <div className="space-y-4">
               <div className="rounded-2xl border border-slate-800 bg-[#06142a]/90 p-4 text-xs space-y-2">
                 <div className="flex justify-between border-b border-slate-800/80 pb-1.5">
-                  <span className="text-slate-400">Full Name</span>
+                  <span className="text-slate-400">{locale === "am" ? "ሙሉ ስም" : "Full Name"}</span>
                   <span className="font-bold text-white">{name}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/80 pb-1.5">
-                  <span className="text-slate-400">Phone & Location</span>
+                  <span className="text-slate-400">{locale === "am" ? "ስልክና አድራሻ" : "Phone & Location"}</span>
                   <span className="font-bold text-white">{phone} • {city}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/80 pb-1.5">
-                  <span className="text-slate-400">Chosen Package</span>
+                  <span className="text-slate-400">{locale === "am" ? "የተመረጠ ጥቅል" : "Chosen Package"}</span>
                   <span className="font-black text-cyan-300">
                     {selectedPackage.name} (ETB {selectedPackage.priceETB.toLocaleString()})
                   </span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/80 pb-1.5">
-                  <span className="text-slate-400">Payment Channel</span>
+                  <span className="text-slate-400">{locale === "am" ? "የክፍያ መንገድ" : "Payment Channel"}</span>
                   <span className="font-bold text-white">{paymentMethod}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/80 pb-1.5">
-                  <span className="text-slate-400">Transaction Reference</span>
+                  <span className="text-slate-400">{locale === "am" ? "የግብይት ማረጋገጫ ቁጥር" : "Transaction Reference"}</span>
                   <span className="font-mono font-bold text-emerald-400">{transactionRef}</span>
                 </div>
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-slate-400">Receipt Proof</span>
+                  <span className="text-slate-400">{locale === "am" ? "የደረሰኝ ሁኔታ" : "Receipt Proof"}</span>
                   <span className="font-bold text-emerald-400 flex items-center gap-1">
-                    <FileCheck className="h-3.5 w-3.5" /> Attached for Super Admin Verification
+                    {receiptScreenshotUrl ? (
+                      <>
+                        <FileCheck className="h-3.5 w-3.5" />
+                        {locale === "am" ? "ደረሰኝ ተያይዟል (ለአስተዳዳሪ ማረጋገጫ)" : "Attached for Admin Verification"}
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        {locale === "am" ? "በግብይት ቁጥር ተረጋግጧል" : "Reference Submitted"}
+                      </>
+                    )}
                   </span>
                 </div>
               </div>
@@ -1006,7 +1200,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                   onClick={() => setStep(4)}
                   className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/60 text-xs font-bold text-slate-300 transition hover:bg-slate-800 hover:text-white"
                 >
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back
+                  <ArrowLeft className="h-3.5 w-3.5" /> {locale === "am" ? "ተመለስ" : "Back"}
                 </button>
 
                 <Button
@@ -1019,7 +1213,8 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <>
-                      Submit & Register <CheckCircle2 className="h-4 w-4" />
+                      {locale === "am" ? "አረጋግጥና ተመዝገብ" : "Submit & Register"}{" "}
+                      <CheckCircle2 className="h-4 w-4" />
                     </>
                   )}
                 </Button>

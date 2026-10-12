@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { NextResponse } from "next/server";
 import { created, problem, validationProblem } from "@/lib/api-response";
 import {
   generateRawToken,
@@ -151,29 +152,44 @@ export async function POST(request: Request) {
     organizationId: storedUser.organizationId
   });
 
-  return created({
-    user: {
-      id: storedUser.id,
-      email: storedUser.email,
-      name: storedUser.fullName,
-      phone: storedUser.phone,
-      role: storedUser.role,
-      organizationId: storedUser.organizationId,
-      emailVerified: true,
-      profileSetupCompleted: true,
-      profile: {
-        id: storedProfile.id,
-        phone: storedProfile.phone,
-        country: storedProfile.country,
-        region: storedProfile.region,
-        city: storedProfile.city,
-        address: storedProfile.address,
-        packageType: storedProfile.packageType,
-        status: storedProfile.status
+  const response = NextResponse.json(
+    {
+      data: {
+        user: {
+          id: storedUser.id,
+          email: storedUser.email,
+          name: storedUser.fullName,
+          phone: storedUser.phone,
+          role: storedUser.role,
+          organizationId: storedUser.organizationId,
+          emailVerified: true,
+          profileSetupCompleted: true,
+          profile: {
+            id: storedProfile.id,
+            phone: storedProfile.phone,
+            country: storedProfile.country,
+            region: storedProfile.region,
+            city: storedProfile.city,
+            address: storedProfile.address,
+            packageType: storedProfile.packageType,
+            status: storedProfile.status
+          }
+        },
+        payment: paymentRecord,
+        accessToken,
+        emailVerificationUrl: `/en/auth/verify-email?token=${verificationToken}`
       }
     },
-    payment: paymentRecord,
-    accessToken,
-    emailVerificationUrl: `/en/auth/verify-email?token=${verificationToken}`
+    { status: 201 }
+  );
+
+  response.cookies.set("myupline_session", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 // 1 hour — matches JWT expiry
   });
+
+  return response;
 }
