@@ -211,8 +211,14 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
   // Fetch dynamic packages and active payment methods from Super Admin CRUD store
   useEffect(() => {
+    async function safeJson(res: Response) {
+      const ct = res.headers.get("content-type") || "";
+      if (!res.ok || !ct.includes("application/json")) return null;
+      try { return await res.json(); } catch { return null; }
+    }
+
     fetch("/api/packages")
-      .then((res) => res.json())
+      .then(safeJson)
       .then((data) => {
         if (data?.data?.packages && data.data.packages.length > 0) {
           setAvailablePackages(data.data.packages);
@@ -233,7 +239,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
       .catch(() => {});
 
     fetch("/api/payment-methods?active=true")
-      .then((res) => res.json())
+      .then(safeJson)
       .then((data) => {
         if (data?.data?.paymentMethods && data.data.paymentMethods.length > 0) {
           setConfiguredMethods(data.data.paymentMethods);
@@ -426,7 +432,17 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
             receiptScreenshotUrl: receiptScreenshotUrl || undefined
           })
         });
-        const payload = await response.json();
+
+        // Safely parse JSON — guard against empty / non-JSON responses
+        let payload: any = null;
+        try {
+          const ct = response.headers.get("content-type") || "";
+          if (ct.includes("application/json")) {
+            payload = await response.json();
+          }
+        } catch {
+          // body was empty or malformed
+        }
 
         if (!response.ok) {
           const fieldErrors = payload?.error?.details?.fieldErrors;
@@ -438,7 +454,10 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
               detailedMsg = `${firstField}: ${msgs[0]}`;
             }
           }
-          throw new Error(detailedMsg ?? "Registration failed. Please verify your details.");
+          throw new Error(
+            detailedMsg ??
+              `Registration failed (HTTP ${response.status}). Please try again or contact support.`
+          );
         }
 
         if (payload?.data?.accessToken) {
@@ -989,7 +1008,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  if (validateStep4()) setStep(5);
+                  if (validateStep4()) { setError(""); setStep(5); }
                 }
               }}
             >
@@ -1211,7 +1230,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                 <button
                   type="button"
                   onClick={() => {
-                    if (validateStep4()) setStep(5);
+                    if (validateStep4()) { setError(""); setStep(5); }
                   }}
                   className="flex h-11 flex-[1.4] items-center justify-center gap-2 rounded-xl bg-cyan-400 text-xs font-black text-brand-navy shadow-lg shadow-cyan-400/25 transition hover:bg-cyan-300"
                 >
