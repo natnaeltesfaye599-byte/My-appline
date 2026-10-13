@@ -199,6 +199,7 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
   const [configuredMethods, setConfiguredMethods] = useState<any[]>(defaultPaymentMethodsFallback);
   const [paymentMethod, setPaymentMethod] = useState("Commercial Bank of Ethiopia (CBE)");
   const [transactionRef, setTransactionRef] = useState("");
+  const [payLater, setPayLater] = useState(false);
   const [receiptScreenshotUrl, setReceiptScreenshotUrl] = useState<string>("");
   const [receiptFileName, setReceiptFileName] = useState<string>("");
   const [copiedAccId, setCopiedAccId] = useState<string | null>(null);
@@ -357,11 +358,12 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
   function validateStep4(): boolean {
     setError("");
+    if (payLater) return true;
     if (!transactionRef.trim() || transactionRef.trim().length < 3) {
       setError(
         locale === "am"
-          ? "እባክዎ የባንክ ወይም የሞባይል ክፍያ ማረጋገጫ ቁጥር (Transaction Reference) ያስገቡ።"
-          : "Please provide your bank or mobile transaction reference number."
+          ? "እባክዎ የባንክ ወይም የሞባይል ክፍያ ማረጋገጫ ቁጥር ያስገቡ ወይም «በቢሮ እከፍላለሁ» የሚለውን ይምረጡ።"
+          : "Please provide your bank or mobile transaction reference number, or select 'Pay Later / Cash at Office'."
       );
       return false;
     }
@@ -400,6 +402,10 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
           router.replace(`/${locale}/dashboard/member`);
         }
       } else {
+        const effectiveTxRef = payLater
+          ? (transactionRef.trim() || `OFFICE-${Date.now().toString().slice(-6)}`)
+          : transactionRef.trim();
+
         // Multi-step Registration with Manual Payment Receipt
         const response = await fetch("/api/auth/register", {
           method: "POST",
@@ -415,15 +421,24 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
             address: address.trim() || "N/A",
             packageType: selectedPackage.name,
             referralCode: referralCode.trim() || undefined,
-            paymentMethod,
-            transactionRef: transactionRef.trim(),
+            paymentMethod: payLater ? "Pay Later / Cash at Office" : paymentMethod,
+            transactionRef: effectiveTxRef,
             receiptScreenshotUrl: receiptScreenshotUrl || undefined
           })
         });
         const payload = await response.json();
 
         if (!response.ok) {
-          throw new Error(payload?.error?.message ?? "Registration failed. Please verify your details.");
+          const fieldErrors = payload?.error?.details?.fieldErrors;
+          let detailedMsg = payload?.error?.message;
+          if (fieldErrors && typeof fieldErrors === "object") {
+            const firstField = Object.keys(fieldErrors)[0];
+            const msgs = (fieldErrors as Record<string, string[]>)[firstField];
+            if (Array.isArray(msgs) && msgs.length > 0) {
+              detailedMsg = `${firstField}: ${msgs[0]}`;
+            }
+          }
+          throw new Error(detailedMsg ?? "Registration failed. Please verify your details.");
         }
 
         if (payload?.data?.accessToken) {
@@ -520,18 +535,22 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
 
                 return (
                   <div key={s} className="flex items-center">
-                    <div
+                    <button
+                      type="button"
+                      disabled={!isPassed}
+                      onClick={() => isPassed && setStep(s as SignUpStep)}
                       className={cn(
                         "flex h-7 w-7 items-center justify-center rounded-full text-xs font-black transition-all duration-300",
                         isPassed
-                          ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
+                          ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30 cursor-pointer hover:scale-110 active:scale-95"
                           : isCurrent
-                          ? "bg-cyan-400 text-brand-navy ring-4 ring-cyan-400/20 shadow-md shadow-cyan-400/30 font-extrabold"
-                          : "border border-slate-700 bg-slate-800/80 text-slate-500"
+                          ? "bg-cyan-400 text-brand-navy ring-4 ring-cyan-400/20 shadow-md shadow-cyan-400/30 font-extrabold cursor-default"
+                          : "border border-slate-700 bg-slate-800/80 text-slate-500 cursor-not-allowed"
                       )}
+                      title={isPassed ? (locale === "am" ? `ወደ ደረጃ ${s} ተመለስ` : `Back to step ${s}`) : undefined}
                     >
                       {isPassed ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : s}
-                    </div>
+                    </button>
 
                     {idx < 4 && (
                       <div
@@ -974,157 +993,211 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                 }
               }}
             >
-              {/* Configured Company Bank & Mobile Accounts */}
-              <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/30 p-3.5 text-xs text-slate-300 space-y-2">
-                <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
-                  <span className="font-bold text-cyan-300 flex items-center gap-1.5">
-                    <Coins className="h-4 w-4" /> {locale === "am" ? "የክፍያ መጠን፦" : "Transfer Amount:"}
-                  </span>
-                  <span className="font-black text-white text-sm">
-                    ETB {selectedPackage.priceETB.toLocaleString()}
-                  </span>
-                </div>
-
-                <p className="text-[10px] uppercase font-bold text-slate-400">
-                  {locale === "am" ? "ክፍያውን ወደሚከተሉት የድርጅቱ አካውንቶች ያስገቡ፦" : "Select a company payment account to transfer:"}
-                </p>
-
-                <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
-                  {(configuredMethods.length > 0 ? configuredMethods : defaultPaymentMethodsFallback).map((m) => {
-                    const isSelected = paymentMethod === m.name;
-                    const isCopied = copiedAccId === m.id;
-
-                    return (
-                      <div
-                        key={m.id}
-                        onClick={() => setPaymentMethod(m.name)}
-                        className={cn(
-                          "cursor-pointer rounded-xl border p-2 text-xs transition",
-                          isSelected
-                            ? "border-cyan-400 bg-cyan-950/60 ring-1 ring-cyan-400"
-                            : "border-slate-800 bg-[#06142a]/80 hover:border-slate-700"
-                        )}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-black text-white">{m.name}</span>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCopyAcc(m.id, m.accountNumber);
-                            }}
-                            className="text-[10px] font-bold text-cyan-300 hover:underline flex items-center gap-1"
-                          >
-                            {isCopied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
-                            {isCopied ? (locale === "am" ? "ተቀድቷል" : "Copied") : (locale === "am" ? "ቅዳ" : "Copy")}
-                          </button>
-                        </div>
-                        <p className="font-mono text-cyan-200 font-bold mt-0.5">{m.accountNumber}</p>
-                        <p className="text-[10px] text-slate-400">{locale === "am" ? "ባለቤት፦" : "Beneficiary:"} {m.accountName}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Payment Method Select */}
-              <div>
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  {locale === "am" ? "የከፈሉበት መንገድ" : "Payment Method"}
-                </label>
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-700 bg-[#06142a] px-3 text-xs text-white outline-none focus:border-cyan-400"
+              {/* Payment Mode Selector */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPayLater(false);
+                    setError("");
+                  }}
+                  className={cn(
+                    "rounded-xl border p-2.5 text-center text-xs font-bold transition",
+                    !payLater
+                      ? "border-cyan-400 bg-cyan-950/60 text-cyan-300 ring-1 ring-cyan-400 shadow-sm"
+                      : "border-slate-800 bg-[#06142a]/70 text-slate-400 hover:border-slate-700"
+                  )}
                 >
-                  {(configuredMethods.length > 0 ? configuredMethods : defaultPaymentMethodsFallback).map((m) => (
-                    <option key={m.id} value={m.name}>
-                      {m.name} ({m.accountNumber})
-                    </option>
-                  ))}
-                </select>
+                  {locale === "am" ? "የባንክ / ሞባይል ክፍያ" : "Bank / Mobile Transfer"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPayLater(true);
+                    setError("");
+                  }}
+                  className={cn(
+                    "rounded-xl border p-2.5 text-center text-xs font-bold transition",
+                    payLater
+                      ? "border-amber-400 bg-amber-950/40 text-amber-300 ring-1 ring-amber-400 shadow-sm"
+                      : "border-slate-800 bg-[#06142a]/70 text-slate-400 hover:border-slate-700"
+                  )}
+                >
+                  {locale === "am" ? "በቢሮ እከፍላለሁ / በኋላ" : "Pay Later / Cash at Office"}
+                </button>
               </div>
 
-              {/* Transaction Reference Number */}
-              <div>
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  {locale === "am" ? "የግብይት ማረጋገጫ ቁጥር (Transaction Reference) *" : "Transaction Reference Number / TX ID *"}
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={transactionRef}
-                  onChange={(e) => setTransactionRef(e.target.value)}
-                  placeholder="e.g. CBE-TX-98217349 or Telebirr TX"
-                  className="h-10 w-full rounded-xl border border-slate-700/80 bg-[#06142a]/90 px-3 text-xs font-mono text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
-                />
-              </div>
-
-              {/* Submit Screenshot of the Receipt */}
-              <div>
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                  {locale === "am" ? "የክፍያ ማረጋገጫ ደረሰኝ (ስክሪንሾት)" : "Submit Screenshot of the Receipt"}
-                </label>
-
-                <div className="relative">
-                  <label className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cyan-500/40 bg-[#06142a]/80 p-4 text-center cursor-pointer hover:border-cyan-400 hover:bg-cyan-950/20 transition">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleReceiptUpload}
-                      className="sr-only"
-                    />
-
-                    {receiptScreenshotUrl ? (
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="h-14 w-14 rounded-xl border border-cyan-400/60 overflow-hidden bg-slate-900 shrink-0">
-                          <img
-                            src={receiptScreenshotUrl}
-                            alt="Receipt Preview"
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                        <div className="text-left flex-1 min-w-0">
-                          <p className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                            <CheckCircle2 className="h-3.5 w-3.5" /> {locale === "am" ? "ደረሰኝ ተያይዟል" : "Screenshot Attached"}
-                          </p>
-                          <p className="text-[10px] text-slate-400 truncate mt-0.5">
-                            {receiptFileName || "receipt_screenshot.png"}
-                          </p>
-                          <span className="text-[10px] text-cyan-300 hover:underline">
-                            {locale === "am" ? "ለመቀየር እዚህ ይጫኑ" : "Click to change screenshot"}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setReceiptScreenshotUrl("");
-                            setReceiptFileName("");
-                          }}
-                          className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-500/20 hover:text-rose-300 transition"
-                          title="Remove screenshot"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300 mb-2">
-                          <Upload className="h-5 w-5" />
-                        </div>
-                        <p className="text-xs font-bold text-slate-200">
-                          {locale === "am" ? "ደረሰኝ ይጫኑ (PNG, JPG)" : "Upload Receipt Screenshot"}
-                        </p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          {locale === "am" ? "ከሞባይል ባንኪንግ ወይም ቴሌብር የተወሰደ ስክሪንሾት" : "PNG, JPG, or screenshot from banking app"}
-                        </p>
-                      </>
-                    )}
-                  </label>
+              {payLater ? (
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-4 text-xs text-amber-200/90 space-y-2">
+                  <p className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <Clock className="h-4 w-4" />
+                    {locale === "am" ? "በቢሮ ክፍያ ወይም በኋላ ይክፈሉ" : "Pay at Office or Complete Later"}
+                  </p>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    {locale === "am"
+                      ? "አካውንትዎን አሁን ማጠናቀቅ ይችላሉ! ክፍያውን በዋናው ቢሮ በጥሬ ገንዘብ ወይም ከዳሽቦርድ በኋላ ሲፈጽሙ አባልነትዎ ሙሉ በሙሉ ይነቃል።"
+                      : "You can create your account now! Once you pay at the headquarters office or verify from your dashboard, your package and full member benefits will be fully activated."}
+                  </p>
+                  <div className="rounded-xl border border-amber-500/20 bg-black/20 p-2.5 text-[11px]">
+                    <span className="text-slate-400">{locale === "am" ? "የተመረጠ ጥቅል፦ " : "Selected Package: "}</span>
+                    <strong className="text-amber-300">{selectedPackage.name} (ETB {selectedPackage.priceETB.toLocaleString()})</strong>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  {/* Configured Company Bank & Mobile Accounts */}
+                  <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/30 p-3.5 text-xs text-slate-300 space-y-2">
+                    <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
+                      <span className="font-bold text-cyan-300 flex items-center gap-1.5">
+                        <Coins className="h-4 w-4" /> {locale === "am" ? "የክፍያ መጠን፦" : "Transfer Amount:"}
+                      </span>
+                      <span className="font-black text-white text-sm">
+                        ETB {selectedPackage.priceETB.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <p className="text-[10px] uppercase font-bold text-slate-400">
+                      {locale === "am" ? "ክፍያውን ወደሚከተሉት የድርጅቱ አካውንቶች ያስገቡ፦" : "Select a company payment account to transfer:"}
+                    </p>
+
+                    <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
+                      {(configuredMethods.length > 0 ? configuredMethods : defaultPaymentMethodsFallback).map((m) => {
+                        const isSelected = paymentMethod === m.name;
+                        const isCopied = copiedAccId === m.id;
+
+                        return (
+                          <div
+                            key={m.id}
+                            onClick={() => setPaymentMethod(m.name)}
+                            className={cn(
+                              "cursor-pointer rounded-xl border p-2 text-xs transition",
+                              isSelected
+                                ? "border-cyan-400 bg-cyan-950/60 ring-1 ring-cyan-400"
+                                : "border-slate-800 bg-[#06142a]/80 hover:border-slate-700"
+                            )}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-black text-white">{m.name}</span>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopyAcc(m.id, m.accountNumber);
+                                }}
+                                className="text-[10px] font-bold text-cyan-300 hover:underline flex items-center gap-1"
+                              >
+                                {isCopied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                                {isCopied ? (locale === "am" ? "ተቀድቷል" : "Copied") : (locale === "am" ? "ቅዳ" : "Copy")}
+                              </button>
+                            </div>
+                            <p className="font-mono text-cyan-200 font-bold mt-0.5">{m.accountNumber}</p>
+                            <p className="text-[10px] text-slate-400">{locale === "am" ? "ባለቤት፦" : "Beneficiary:"} {m.accountName}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Payment Method Select */}
+                  <div>
+                    <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                      {locale === "am" ? "የከፈሉበት መንገድ" : "Payment Method"}
+                    </label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="h-10 w-full rounded-xl border border-slate-700 bg-[#06142a] px-3 text-xs text-white outline-none focus:border-cyan-400"
+                    >
+                      {(configuredMethods.length > 0 ? configuredMethods : defaultPaymentMethodsFallback).map((m) => (
+                        <option key={m.id} value={m.name}>
+                          {m.name} ({m.accountNumber})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Transaction Reference Number */}
+                  <div>
+                    <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                      {locale === "am" ? "የግብይት ማረጋገጫ ቁጥር (Transaction Reference) *" : "Transaction Reference Number / TX ID *"}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={transactionRef}
+                      onChange={(e) => setTransactionRef(e.target.value)}
+                      placeholder="e.g. CBE-TX-98217349 or Telebirr TX"
+                      className="h-10 w-full rounded-xl border border-slate-700/80 bg-[#06142a]/90 px-3 text-xs font-mono text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
+                    />
+                  </div>
+
+                  {/* Submit Screenshot of the Receipt */}
+                  <div>
+                    <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                      {locale === "am" ? "የክፍያ ማረጋገጫ ደረሰኝ (ስክሪንሾት)" : "Submit Screenshot of the Receipt"}
+                    </label>
+
+                    <div className="relative">
+                      <label className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cyan-500/40 bg-[#06142a]/80 p-4 text-center cursor-pointer hover:border-cyan-400 hover:bg-cyan-950/20 transition">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleReceiptUpload}
+                          className="sr-only"
+                        />
+
+                        {receiptScreenshotUrl ? (
+                          <div className="flex items-center gap-3 w-full">
+                            <div className="h-14 w-14 rounded-xl border border-cyan-400/60 overflow-hidden bg-slate-900 shrink-0">
+                              <img
+                                src={receiptScreenshotUrl}
+                                alt="Receipt Preview"
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <div className="text-left flex-1 min-w-0">
+                              <p className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                                <CheckCircle2 className="h-3.5 w-3.5" /> {locale === "am" ? "ደረሰኝ ተያይዟል" : "Screenshot Attached"}
+                              </p>
+                              <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                                {receiptFileName || "receipt_screenshot.png"}
+                              </p>
+                              <span className="text-[10px] text-cyan-300 hover:underline">
+                                {locale === "am" ? "ለመቀየር እዚህ ይጫኑ" : "Click to change screenshot"}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setReceiptScreenshotUrl("");
+                                setReceiptFileName("");
+                              }}
+                              className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-500/20 hover:text-rose-300 transition"
+                              title="Remove screenshot"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300 mb-2">
+                              <Upload className="h-5 w-5" />
+                            </div>
+                            <p className="text-xs font-bold text-slate-200">
+                              {locale === "am" ? "ደረሰኝ ይጫኑ (PNG, JPG)" : "Upload Receipt Screenshot"}
+                            </p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">
+                              {locale === "am" ? "ከሞባይል ባንኪንግ ወይም ቴሌብር የተወሰደ ስክሪንሾት" : "PNG, JPG, or screenshot from banking app"}
+                            </p>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="flex items-center gap-3 pt-2">
                 <button
@@ -1170,16 +1243,25 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                 </div>
                 <div className="flex justify-between border-b border-slate-800/80 pb-1.5">
                   <span className="text-slate-400">{locale === "am" ? "የክፍያ መንገድ" : "Payment Channel"}</span>
-                  <span className="font-bold text-white">{paymentMethod}</span>
+                  <span className="font-bold text-white">
+                    {payLater ? (locale === "am" ? "በቢሮ እከፍላለሁ / በኋላ" : "Pay Later / Cash at Office") : paymentMethod}
+                  </span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/80 pb-1.5">
                   <span className="text-slate-400">{locale === "am" ? "የግብይት ማረጋገጫ ቁጥር" : "Transaction Reference"}</span>
-                  <span className="font-mono font-bold text-emerald-400">{transactionRef}</span>
+                  <span className="font-mono font-bold text-emerald-400">
+                    {payLater ? (locale === "am" ? "በቢሮ የሚረጋገጥ" : "To be verified at office") : (transactionRef || "N/A")}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between pt-1">
                   <span className="text-slate-400">{locale === "am" ? "የደረሰኝ ሁኔታ" : "Receipt Proof"}</span>
                   <span className="font-bold text-emerald-400 flex items-center gap-1">
-                    {receiptScreenshotUrl ? (
+                    {payLater ? (
+                      <>
+                        <Clock className="h-3.5 w-3.5 text-amber-400" />
+                        <span className="text-amber-300">{locale === "am" ? "በቢሮ የሚፈጸም" : "Pending Office Payment"}</span>
+                      </>
+                    ) : receiptScreenshotUrl ? (
                       <>
                         <FileCheck className="h-3.5 w-3.5" />
                         {locale === "am" ? "ደረሰኝ ተያይዟል (ለአስተዳዳሪ ማረጋገጫ)" : "Attached for Admin Verification"}
@@ -1193,6 +1275,41 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                   </span>
                 </div>
               </div>
+
+              {/* In-Step Error Alert with Direct Resolution Actions */}
+              {error && (
+                <div className="rounded-xl border border-rose-500/40 bg-rose-500/15 p-3 text-xs text-rose-200 space-y-2 animate-in fade-in">
+                  <p className="font-semibold">{error}</p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {error.toLowerCase().includes("email") && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => { setError(""); setStep(1); }}
+                          className="rounded-lg bg-rose-900/60 hover:bg-rose-800 border border-rose-400/40 px-2.5 py-1 text-[11px] font-bold text-white transition"
+                        >
+                          {locale === "am" ? "ኢሜይል ያስተካክሉ (ደረጃ 1)" : "Edit Email (Step 1)"}
+                        </button>
+                        <Link
+                          href={`/${locale}/auth/sign-in`}
+                          className="rounded-lg bg-cyan-400 text-brand-navy px-2.5 py-1 text-[11px] font-bold transition hover:bg-cyan-300"
+                        >
+                          {locale === "am" ? "ወደ መግቢያ ገጽ (Sign In)" : "Go to Sign In"}
+                        </Link>
+                      </>
+                    )}
+                    {error.toLowerCase().includes("phone") && (
+                      <button
+                        type="button"
+                        onClick={() => { setError(""); setStep(2); }}
+                        className="rounded-lg bg-rose-900/60 hover:bg-rose-800 border border-rose-400/40 px-2.5 py-1 text-[11px] font-bold text-white transition"
+                      >
+                        {locale === "am" ? "ስልክ ቁጥር ያስተካክሉ (ደረጃ 2)" : "Edit Phone (Step 2)"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center gap-3 pt-2">
                 <button

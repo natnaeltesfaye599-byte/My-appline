@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   ChevronDown,
   CircleDollarSign,
+  Clock,
   CreditCard,
   Download,
   FileBarChart,

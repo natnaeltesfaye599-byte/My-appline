@@ -113,36 +113,45 @@ export async function POST(request: Request) {
     });
   }
 
-  // 5. Attempt Prisma write if connected
-  try {
-    const org = await getDefaultOrganization();
-    await prisma.user.create({
-      data: {
-        id: storedUser.id,
-        fullName: name,
-        email: normalizedEmail,
-        phone: cleanPhone,
-        passwordHash,
-        role: "MEMBER",
-        organizationId: org.id,
-        profile: {
-          create: {
-            id: storedProfile.id,
-            firstName: storedProfile.firstName,
-            lastName: storedProfile.lastName,
+  // 5. Attempt Prisma write if connected and not in demo mode
+  if (process.env.DEMO_MODE_ENABLED !== "true") {
+    try {
+      const org = await Promise.race([
+        getDefaultOrganization(),
+        new Promise<null>((_, reject) =>
+          setTimeout(() => reject(new Error("DB timeout")), 1200)
+        )
+      ]);
+      if (org) {
+        await prisma.user.create({
+          data: {
+            id: storedUser.id,
+            fullName: name,
+            email: normalizedEmail,
             phone: cleanPhone,
-            country: storedProfile.country,
-            region: storedProfile.region,
-            city: storedProfile.city,
-            address: storedProfile.address,
-            referralCode: storedProfile.referralCode,
-            status: initialStatus as any
+            passwordHash,
+            role: "MEMBER",
+            organizationId: org.id,
+            profile: {
+              create: {
+                id: storedProfile.id,
+                firstName: storedProfile.firstName,
+                lastName: storedProfile.lastName,
+                phone: cleanPhone,
+                country: storedProfile.country,
+                region: storedProfile.region,
+                city: storedProfile.city,
+                address: storedProfile.address,
+                referralCode: storedProfile.referralCode,
+                status: initialStatus as any
+              } as any
+            }
           } as any
-        }
-      } as any
-    });
-  } catch {
-    // If PostgreSQL service is offline, dbStore ensures complete data retention
+        });
+      }
+    } catch {
+      // If PostgreSQL service is offline, dbStore ensures complete data retention
+    }
   }
 
   const accessToken = signAccessToken({
