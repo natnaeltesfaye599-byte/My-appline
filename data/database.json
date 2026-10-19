@@ -1383,5 +1383,123 @@
     "trainingCohortAlerts": true,
     "weeklyExecutiveDigest": true,
     "updatedAt": "2026-09-03T10:10:06.249Z"
-  }
+  },
+  "notifications": [
+    {
+      "id": "notif-adm-01",
+      "type": "payment",
+      "title": "Payment Pending Verification",
+      "description": "Mulgeta Desta submitted a Diamond package payment receipt — awaiting approval.",
+      "time": "2 min ago",
+      "isRead": false,
+      "targetRoles": [
+        "SUPER_ADMIN",
+        "ADMIN"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    },
+    {
+      "id": "notif-adm-02",
+      "type": "alert",
+      "title": "Failed Login Attempt Blocked",
+      "description": "An unauthorized login attempt was detected and blocked from IP 41.66.x.x.",
+      "time": "4 hrs ago",
+      "isRead": true,
+      "targetRoles": [
+        "SUPER_ADMIN",
+        "ADMIN"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    },
+    {
+      "id": "notif-lead-01",
+      "type": "member",
+      "title": "New Member Registered",
+      "description": "Tigist Bekele joined the Vision Leaders team under Bronze Starter package.",
+      "time": "18 min ago",
+      "isRead": false,
+      "targetRoles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "TEAM_LEADER"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    },
+    {
+      "id": "notif-lead-02",
+      "type": "goal",
+      "title": "Team Milestone Reached 🎉",
+      "description": "Solomon Hailu hit 25,000 GV — eligible for Gold Executive promotion this week!",
+      "time": "1 hr ago",
+      "isRead": false,
+      "targetRoles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "TEAM_LEADER"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    },
+    {
+      "id": "notif-trn-01",
+      "type": "training",
+      "title": "Course Enrolment Spike",
+      "description": "Over 40 new members enrolled in Leadership Fundamentals Level 1.",
+      "time": "2 hrs ago",
+      "isRead": false,
+      "targetRoles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "TRAINER"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    },
+    {
+      "id": "notif-mem-01",
+      "type": "announcement",
+      "title": "Welcome to MyUpline Network",
+      "description": "Your personalized member dashboard is ready. Set up your Dream Goal Board to kickstart your journey.",
+      "time": "Just now",
+      "isRead": false,
+      "targetRoles": [
+        "MEMBER"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    },
+    {
+      "id": "notif-mem-02",
+      "type": "training",
+      "title": "New Training Assigned",
+      "description": "Coach Dawit published 'Getting Started Fast: 48-Hour Blueprint' — access it in your Training Hub.",
+      "time": "1 hr ago",
+      "isRead": false,
+      "targetRoles": [
+        "MEMBER"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    },
+    {
+      "id": "notif-mem-03",
+      "type": "goal",
+      "title": "Daily Activity Reminder",
+      "description": "Keep your streak going! Track your 3 prospecting contacts and follow-ups in the Daily Tracker.",
+      "time": "3 hrs ago",
+      "isRead": false,
+      "targetRoles": [
+        "MEMBER"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    },
+    {
+      "id": "notif-mem-04",
+      "type": "announcement",
+      "title": "Daily Motivation",
+      "description": "Consistency is what transforms average into excellence. Check your inspirational quote today.",
+      "time": "Yesterday",
+      "isRead": true,
+      "targetRoles": [
+        "MEMBER"
+      ],
+      "createdAt": "2026-10-19T21:57:09.824Z"
+    }
+  ]
 }

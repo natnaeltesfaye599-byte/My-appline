@@ -893,7 +893,7 @@ function SuperAdminWorkspace({
               <span className="lg:hidden">AI</span>
             </button>
 
-            <NotificationBell />
+            <NotificationBell currentUser={currentUser} userRole={userRole} />
 
             {/* Avatar — visible from md */}
             <div
@@ -1292,7 +1292,7 @@ function GenericDashboard({
               <span className="lg:hidden">AI</span>
             </button>
 
-            <NotificationBell />
+            <NotificationBell currentUser={currentUser} userRole={userRole} />
 
             <div
               onClick={() => setView("profile")}

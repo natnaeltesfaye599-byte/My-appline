@@ -306,6 +306,19 @@ export interface StoredSettings {
   updatedAt: string;
 }
 
+export interface StoredNotification {
+  id: string;
+  type: "payment" | "member" | "goal" | "alert" | "announcement" | "commission" | "training";
+  title: string;
+  description: string;
+  time: string;
+  isRead: boolean;
+  targetRoles?: string[];
+  targetUserId?: string | null;
+  link?: string;
+  createdAt: string;
+}
+
 interface DatabaseSchema {
   users: StoredUser[];
   profiles: StoredProfile[];
@@ -319,6 +332,7 @@ interface DatabaseSchema {
   cms: StoredCmsContent;
   motivations: StoredDailyMotivation[];
   teams: StoredTeam[];
+  notifications?: StoredNotification[];
   settings?: StoredSettings;
 }
 
@@ -1061,6 +1075,101 @@ const defaultSettings: StoredSettings = {
   updatedAt: new Date().toISOString()
 };
 
+export const defaultNotifications: StoredNotification[] = [
+  // Admin-only Notifications
+  {
+    id: "notif-adm-01",
+    type: "payment",
+    title: "Payment Pending Verification",
+    description: "Mulgeta Desta submitted a Diamond package payment receipt — awaiting approval.",
+    time: "2 min ago",
+    isRead: false,
+    targetRoles: ["SUPER_ADMIN", "ADMIN"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "notif-adm-02",
+    type: "alert",
+    title: "Failed Login Attempt Blocked",
+    description: "An unauthorized login attempt was detected and blocked from IP 41.66.x.x.",
+    time: "4 hrs ago",
+    isRead: true,
+    targetRoles: ["SUPER_ADMIN", "ADMIN"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "notif-lead-01",
+    type: "member",
+    title: "New Member Registered",
+    description: "Tigist Bekele joined the Vision Leaders team under Bronze Starter package.",
+    time: "18 min ago",
+    isRead: false,
+    targetRoles: ["SUPER_ADMIN", "ADMIN", "TEAM_LEADER"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "notif-lead-02",
+    type: "goal",
+    title: "Team Milestone Reached 🎉",
+    description: "Solomon Hailu hit 25,000 GV — eligible for Gold Executive promotion this week!",
+    time: "1 hr ago",
+    isRead: false,
+    targetRoles: ["SUPER_ADMIN", "ADMIN", "TEAM_LEADER"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "notif-trn-01",
+    type: "training",
+    title: "Course Enrolment Spike",
+    description: "Over 40 new members enrolled in Leadership Fundamentals Level 1.",
+    time: "2 hrs ago",
+    isRead: false,
+    targetRoles: ["SUPER_ADMIN", "ADMIN", "TRAINER"],
+    createdAt: new Date().toISOString()
+  },
+  // Member Notifications (Targeted to MEMBER role)
+  {
+    id: "notif-mem-01",
+    type: "announcement",
+    title: "Welcome to MyUpline Network",
+    description: "Your personalized member dashboard is ready. Set up your Dream Goal Board to kickstart your journey.",
+    time: "Just now",
+    isRead: false,
+    targetRoles: ["MEMBER"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "notif-mem-02",
+    type: "training",
+    title: "New Training Assigned",
+    description: "Coach Dawit published 'Getting Started Fast: 48-Hour Blueprint' — access it in your Training Hub.",
+    time: "1 hr ago",
+    isRead: false,
+    targetRoles: ["MEMBER"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "notif-mem-03",
+    type: "goal",
+    title: "Daily Activity Reminder",
+    description: "Keep your streak going! Track your 3 prospecting contacts and follow-ups in the Daily Tracker.",
+    time: "3 hrs ago",
+    isRead: false,
+    targetRoles: ["MEMBER"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "notif-mem-04",
+    type: "announcement",
+    title: "Daily Motivation",
+    description: "Consistency is what transforms average into excellence. Check your inspirational quote today.",
+    time: "Yesterday",
+    isRead: true,
+    targetRoles: ["MEMBER"],
+    createdAt: new Date().toISOString()
+  }
+];
+
 let memoryDb: DatabaseSchema | null = null;
 
 function ensureDb(): DatabaseSchema {
@@ -1274,7 +1383,8 @@ function ensureDb(): DatabaseSchema {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         }
-      ]
+      ],
+      notifications: defaultNotifications
     };
     try {
       fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), "utf-8");
@@ -1340,6 +1450,10 @@ function ensureDb(): DatabaseSchema {
       parsed.teams = defaultTeams;
       modified = true;
     }
+    if (!Array.isArray(parsed.notifications) || parsed.notifications.length === 0) {
+      parsed.notifications = defaultNotifications;
+      modified = true;
+    }
     if (!parsed.settings) {
       parsed.settings = defaultSettings;
       modified = true;
@@ -1368,6 +1482,7 @@ function ensureDb(): DatabaseSchema {
       cms: defaultCms,
       motivations: defaultMotivations,
       teams: defaultTeams,
+      notifications: defaultNotifications,
       settings: defaultSettings
     };
     return memoryDb;
@@ -1709,6 +1824,34 @@ export const dbStore = {
       updatedAt: now
     };
     db.payments.unshift(newPayment);
+
+    // RBAC Notifications
+    if (!Array.isArray(db.notifications)) db.notifications = defaultNotifications;
+    // 1. Admin verification alert (SUPER_ADMIN, ADMIN only)
+    db.notifications.unshift({
+      id: "notif-" + crypto.randomUUID().slice(0, 8),
+      type: "payment",
+      title: "Payment Pending Verification",
+      description: `${params.userName || "A member"} submitted payment for ${params.packageName || "Package"} (Ref: ${cleanRef}) — awaiting review.`,
+      time: "Just now",
+      isRead: false,
+      targetRoles: ["SUPER_ADMIN", "ADMIN"],
+      targetUserId: null,
+      createdAt: now
+    });
+    // 2. Member's personal confirmation (Strictly for this member)
+    db.notifications.unshift({
+      id: "notif-" + crypto.randomUUID().slice(0, 8),
+      type: "payment",
+      title: "Enrollment Payment Submitted",
+      description: `Your payment receipt for ${params.packageName || "Package"} (Ref: ${cleanRef}) has been submitted and is pending verification.`,
+      time: "Just now",
+      isRead: false,
+      targetRoles: ["MEMBER"],
+      targetUserId: params.userId,
+      createdAt: now
+    });
+
     saveDb(db);
     return newPayment;
   },
@@ -1737,13 +1880,27 @@ export const dbStore = {
       profile.updatedAt = now;
     }
 
+    // Member's personal notification: ONLY for this user
+    if (!Array.isArray(db.notifications)) db.notifications = defaultNotifications;
+    db.notifications.unshift({
+      id: "notif-" + crypto.randomUUID().slice(0, 8),
+      type: "payment",
+      title: "Payment Verified & Approved 🎉",
+      description: `Your payment for ${payment.packageName} has been verified and approved by ${verifiedBy}. All access unlocked!`,
+      time: "Just now",
+      isRead: false,
+      targetRoles: ["MEMBER"],
+      targetUserId: payment.userId,
+      createdAt: now
+    });
+
     saveDb(db);
     return payment;
   },
 
   rejectPayment(
     paymentId: string,
-    reason?: string,
+    adminNotes?: string,
     verifiedBy = "Super Admin"
   ): StoredPaymentSubmission | null {
     const db = ensureDb();
@@ -1752,10 +1909,24 @@ export const dbStore = {
 
     const now = new Date().toISOString();
     payment.status = "REJECTED";
-    payment.adminNotes = reason || "Payment verification failed. Invalid receipt reference.";
+    payment.adminNotes = adminNotes;
     payment.verifiedAt = now;
     payment.verifiedBy = verifiedBy;
     payment.updatedAt = now;
+
+    // Member's personal rejection notification: ONLY for this user
+    if (!Array.isArray(db.notifications)) db.notifications = defaultNotifications;
+    db.notifications.unshift({
+      id: "notif-" + crypto.randomUUID().slice(0, 8),
+      type: "alert",
+      title: "Payment Verification Issue",
+      description: `Your payment for ${payment.packageName} was not approved: ${adminNotes || "Please re-upload a clear receipt or contact support."}`,
+      time: "Just now",
+      isRead: false,
+      targetRoles: ["MEMBER"],
+      targetUserId: payment.userId,
+      createdAt: now
+    });
 
     saveDb(db);
     return payment;
@@ -2988,5 +3159,107 @@ export const dbStore = {
     };
     saveDb(db);
     return db.settings;
+  },
+
+  // ─── Notification RBAC Store ─────────────────────────────────────────────
+
+  getNotificationsForUser(userRole: string, userId?: string | null): StoredNotification[] {
+    const db = ensureDb();
+    if (!Array.isArray(db.notifications) || db.notifications.length === 0) {
+      db.notifications = defaultNotifications;
+      saveDb(db);
+    }
+
+    return db.notifications.filter((n) => {
+      // 1. If notification is strictly targeted to a specific userId:
+      if (n.targetUserId) {
+        return Boolean(userId && n.targetUserId === userId);
+      }
+
+      // 2. Member RBAC: members can ONLY see member-targeted broadcast or their own
+      if (userRole === "MEMBER") {
+        if (n.targetRoles && !n.targetRoles.includes("MEMBER")) return false;
+        if (n.type === "alert" || n.type === "payment") return false;
+        return n.targetRoles ? n.targetRoles.includes("MEMBER") : true;
+      }
+
+      // 3. Other roles (SUPER_ADMIN, ADMIN, TEAM_LEADER, TRAINER)
+      if (n.targetRoles && n.targetRoles.length > 0) {
+        return n.targetRoles.includes(userRole);
+      }
+      return true;
+    });
+  },
+
+  createNotification(params: {
+    type: "payment" | "member" | "goal" | "alert" | "announcement" | "commission" | "training";
+    title: string;
+    description: string;
+    targetRoles?: string[];
+    targetUserId?: string | null;
+    link?: string;
+  }): StoredNotification {
+    const db = ensureDb();
+    if (!Array.isArray(db.notifications)) db.notifications = defaultNotifications;
+    const now = new Date().toISOString();
+    const newNotif: StoredNotification = {
+      id: "notif-" + crypto.randomUUID().slice(0, 8),
+      type: params.type,
+      title: params.title,
+      description: params.description,
+      time: "Just now",
+      isRead: false,
+      targetRoles: params.targetRoles,
+      targetUserId: params.targetUserId || null,
+      link: params.link,
+      createdAt: now
+    };
+    db.notifications.unshift(newNotif);
+    saveDb(db);
+    return newNotif;
+  },
+
+  markNotificationRead(notificationId: string, userId?: string | null): boolean {
+    const db = ensureDb();
+    if (!Array.isArray(db.notifications)) return false;
+    const notif = db.notifications.find((n) => n.id === notificationId);
+    if (!notif) return false;
+    // Verify ownership if targeted to a specific user
+    if (notif.targetUserId && userId && notif.targetUserId !== userId) {
+      return false;
+    }
+    notif.isRead = true;
+    saveDb(db);
+    return true;
+  },
+
+  markAllNotificationsRead(userRole: string, userId?: string | null): boolean {
+    const db = ensureDb();
+    if (!Array.isArray(db.notifications)) return false;
+    db.notifications.forEach((n) => {
+      if (n.targetUserId && userId && n.targetUserId === userId) {
+        n.isRead = true;
+      } else if (!n.targetUserId && n.targetRoles?.includes(userRole)) {
+        n.isRead = true;
+      }
+    });
+    saveDb(db);
+    return true;
+  },
+
+  dismissNotification(notificationId: string, userId?: string | null): boolean {
+    const db = ensureDb();
+    if (!Array.isArray(db.notifications)) return false;
+    const notif = db.notifications.find((n) => n.id === notificationId);
+    if (notif?.targetUserId && userId && notif.targetUserId !== userId) {
+      return false;
+    }
+    const before = db.notifications.length;
+    db.notifications = db.notifications.filter((n) => n.id !== notificationId);
+    if (db.notifications.length < before) {
+      saveDb(db);
+      return true;
+    }
+    return false;
   }
 };

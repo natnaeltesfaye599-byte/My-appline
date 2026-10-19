@@ -183,3 +183,82 @@ export function canRoleAccessView(userRole: SystemRole, view: DashboardView): bo
   const allowed = roleAllowedViews[userRole] || [];
   return allowed.includes(view);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Notification RBAC
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type NotificationType =
+  | "payment"
+  | "member"
+  | "goal"
+  | "alert"
+  | "announcement"
+  | "commission"
+  | "training";
+
+export interface RbacNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  description: string;
+  time?: string;
+  createdAt?: string;
+  isRead: boolean;
+  targetRoles?: SystemRole[];
+  targetUserId?: string | null;
+  link?: string;
+}
+
+/**
+ * Strict RBAC: Determines whether a user is authorized to see a given notification.
+ * - If notification is targeted to a specific user (targetUserId), ONLY that exact user can see it.
+ * - Members CANNOT see system alerts or payments/receipts of other users.
+ * - Members can ONLY see notifications addressed to their personal userId or general announcements for MEMBER.
+ * - Staff/Admin roles can only see notifications that include their role in targetRoles.
+ */
+export function canUserAccessNotification(
+  userRole: SystemRole,
+  userId?: string | null,
+  notification?: {
+    type?: string;
+    targetRoles?: SystemRole[];
+    targetUserId?: string | null;
+  } | null
+): boolean {
+  if (!notification) return false;
+
+  // Rule 1: Specific user targeting
+  if (notification.targetUserId) {
+    return Boolean(userId && notification.targetUserId === userId);
+  }
+
+  // Rule 2: Member strict isolation
+  if (userRole === "MEMBER") {
+    // If targetRoles exists and does not include MEMBER -> DENY
+    if (notification.targetRoles && !notification.targetRoles.includes("MEMBER")) {
+      return false;
+    }
+    // Members NEVER see system security alerts
+    if (notification.type === "alert") {
+      return false;
+    }
+    // Members NEVER see payment verification queues for other users
+    if (notification.type === "payment") {
+      return false;
+    }
+    // Only allow if targetRoles explicitly includes MEMBER or is a general announcement
+    if (notification.targetRoles) {
+      return notification.targetRoles.includes("MEMBER");
+    }
+    return true;
+  }
+
+  // Rule 3: Other roles (SUPER_ADMIN, ADMIN, TEAM_LEADER, TRAINER)
+  if (notification.targetRoles && notification.targetRoles.length > 0) {
+    return notification.targetRoles.includes(userRole);
+  }
+
+  return true;
+}
+
