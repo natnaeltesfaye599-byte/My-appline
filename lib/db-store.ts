@@ -1061,9 +1061,17 @@ const defaultSettings: StoredSettings = {
   updatedAt: new Date().toISOString()
 };
 
+let memoryDb: DatabaseSchema | null = null;
+
 function ensureDb(): DatabaseSchema {
+  if (memoryDb) {
+    return memoryDb;
+  }
+
   if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
+    try {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    } catch {}
   }
 
   if (!fs.existsSync(DB_FILE)) {
@@ -1268,7 +1276,12 @@ function ensureDb(): DatabaseSchema {
         }
       ]
     };
-    fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), "utf-8");
+    try {
+      fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), "utf-8");
+    } catch (writeErr) {
+      console.warn("[dbStore] Initial write failed (operating in-memory):", writeErr);
+    }
+    memoryDb = initialData;
     return initialData;
   }
 
@@ -1276,11 +1289,26 @@ function ensureDb(): DatabaseSchema {
     const raw = fs.readFileSync(DB_FILE, "utf-8");
     const parsed = JSON.parse(raw) as DatabaseSchema;
     let modified = false;
+
+    if (!Array.isArray(parsed.users)) {
+      parsed.users = [];
+      modified = true;
+    }
+    if (!Array.isArray(parsed.profiles)) {
+      parsed.profiles = [];
+      modified = true;
+    }
+    if (!Array.isArray(parsed.organizations) || parsed.organizations.length === 0) {
+      parsed.organizations = [
+        { id: "org-default-01", name: "MyUpline Global", slug: "myupline" }
+      ];
+      modified = true;
+    }
     if (!parsed.packages || parsed.packages.length === 0) {
       parsed.packages = defaultPackages;
       modified = true;
     }
-    if (!parsed.payments) {
+    if (!Array.isArray(parsed.payments)) {
       parsed.payments = [];
       modified = true;
     }
@@ -1317,11 +1345,15 @@ function ensureDb(): DatabaseSchema {
       modified = true;
     }
     if (modified) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+      try {
+        fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+      } catch {}
     }
-    return parsed;
+    memoryDb = parsed;
+    return memoryDb;
   } catch {
-    return {
+    if (memoryDb) return memoryDb;
+    memoryDb = {
       users: [],
       profiles: [],
       packages: defaultPackages,
@@ -1329,19 +1361,29 @@ function ensureDb(): DatabaseSchema {
       paymentMethods: defaultPaymentMethods,
       trainers: defaultTrainers,
       trainings: defaultTrainings,
-      organizations: [],
+      organizations: [
+        { id: "org-default-01", name: "MyUpline Global", slug: "myupline" }
+      ],
       blog: defaultBlogPosts,
       cms: defaultCms,
       motivations: defaultMotivations,
       teams: defaultTeams,
       settings: defaultSettings
     };
+    return memoryDb;
   }
 }
 
 function saveDb(data: DatabaseSchema): void {
-  ensureDb();
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
+  memoryDb = data;
+  try {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[dbStore] Non-fatal: failed persisting database.json to disk:", err);
+  }
 }
 
 export function normalizePhone(raw?: string | null): string | null {
@@ -1548,6 +1590,9 @@ export const dbStore = {
       updatedAt: now
     };
 
+    if (!Array.isArray(db.users)) db.users = [];
+    if (!Array.isArray(db.profiles)) db.profiles = [];
+
     db.users.push(newUser);
     db.profiles.push(newProfile);
     saveDb(db);
@@ -1644,19 +1689,21 @@ export const dbStore = {
     receiptScreenshotUrl: string;
   }): StoredPaymentSubmission {
     const db = ensureDb();
+    if (!Array.isArray(db.payments)) db.payments = [];
     const now = new Date().toISOString();
+    const cleanRef = (params.transactionRef || "").toString().trim() || ("MANUAL-TX-" + Date.now().toString().slice(-6));
     const newPayment: StoredPaymentSubmission = {
       id: "pay-" + crypto.randomUUID().slice(0, 8),
       userId: params.userId,
-      userName: params.userName,
-      userEmail: params.userEmail,
-      userPhone: params.userPhone,
-      packageId: params.packageId,
-      packageName: params.packageName,
-      amountETB: Number(params.amountETB),
-      paymentMethod: params.paymentMethod,
-      transactionRef: params.transactionRef.trim(),
-      receiptScreenshotUrl: params.receiptScreenshotUrl,
+      userName: params.userName || "Valued Member",
+      userEmail: params.userEmail || "",
+      userPhone: params.userPhone || "",
+      packageId: params.packageId || "pkg-custom",
+      packageName: params.packageName || "Diamond",
+      amountETB: Number(params.amountETB) || 0,
+      paymentMethod: params.paymentMethod || "Commercial Bank of Ethiopia (CBE)",
+      transactionRef: cleanRef,
+      receiptScreenshotUrl: params.receiptScreenshotUrl || "/receipt-placeholder.png",
       status: "PENDING_VERIFICATION",
       createdAt: now,
       updatedAt: now

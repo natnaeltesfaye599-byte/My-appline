@@ -425,10 +425,10 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
             region: region.trim() || "Addis Ababa",
             city: city.trim() || "Addis Ababa",
             address: address.trim() || "N/A",
-            packageType: selectedPackage.name,
-            referralCode: referralCode.trim() || undefined,
-            paymentMethod: payLater ? "Pay Later / Cash at Office" : paymentMethod,
-            transactionRef: effectiveTxRef,
+            packageType: selectedPackage?.name || "Diamond",
+            referralCode: referralCode?.trim() || undefined,
+            paymentMethod: payLater ? "Pay Later / Cash at Office" : (paymentMethod || "Commercial Bank of Ethiopia (CBE)"),
+            transactionRef: effectiveTxRef || undefined,
             receiptScreenshotUrl: receiptScreenshotUrl || undefined
           })
         });
@@ -455,8 +455,10 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
             }
           }
           throw new Error(
-            detailedMsg ??
-              `Registration failed (HTTP ${response.status}). Please try again or contact support.`
+            detailedMsg ||
+              (locale === "am"
+                ? `ምዝገባው አልተሳካም (HTTP ${response.status})። እባክዎ እንደገና ይሞክሩ።`
+                : `Registration failed (HTTP ${response.status}). Please try again or contact support.`)
           );
         }
 
@@ -1324,6 +1326,15 @@ export function AuthForm({ locale, mode }: AuthFormProps) {
                         className="rounded-lg bg-rose-900/60 hover:bg-rose-800 border border-rose-400/40 px-2.5 py-1 text-[11px] font-bold text-white transition"
                       >
                         {locale === "am" ? "ስልክ ቁጥር ያስተካክሉ (ደረጃ 2)" : "Edit Phone (Step 2)"}
+                      </button>
+                    )}
+                    {!error.toLowerCase().includes("email") && !error.toLowerCase().includes("phone") && (
+                      <button
+                        type="button"
+                        onClick={() => handleFinalSubmit()}
+                        className="rounded-lg bg-cyan-400 text-brand-navy px-2.5 py-1 text-[11px] font-bold transition hover:bg-cyan-300"
+                      >
+                        {locale === "am" ? "እንደገና ይሞክሩ" : "Try Again"}
                       </button>
                     )}
                   </div>
